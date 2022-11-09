@@ -4,7 +4,8 @@
 enum BinaryOperation
 {
   BO_Add,
-  BO_Sub
+  BO_Sub,
+  BO_Mul
 };
 
 enum ExprKind
@@ -36,9 +37,12 @@ typedef struct Token
   int value;
 } Token;
 
+// prototype declaration
 int isDigit(char c);
 int intLength(char *str);
 int parseInt(char *str);
+Expr *parseMultiplicative(Token **ptrptr, Token *token_end);
+Expr *parseAdditive(Token **ptrptr, Token *token_end);
 
 Token tokens[1000];
 
@@ -70,7 +74,11 @@ void EvaluateExprIntoRax(Expr *expr)
       printf("    sub rax,rdi\n");
       break;
     }
-
+    case BO_Mul:
+    {
+      printf("    imul rax,rdi\n");
+      break;
+    }
     default:
     {
       fprintf(stderr, "Invalid binaryop kind:%d", expr->binary_op);
@@ -124,26 +132,21 @@ Expr *parsePrimary(Token **ptrptr, Token *token_end)
 
 Expr *parseExpr(Token **ptrptr, Token *token_end)
 {
+  return parseAdditive(ptrptr, token_end);
+}
+Expr *parseMultiplicative(Token **ptrptr, Token *token_end)
+{
   Token *tokens = *ptrptr;
-  Expr *result = calloc(1, sizeof(Expr));
   if (token_end == tokens)
   {
     fprintf(stderr, "No token found");
     exit(1);
   }
+  Expr *result = parsePrimary(&tokens, token_end);
+
+  for (; tokens < token_end;)
   {
-    Token token = tokens[0];
-    if (token.kind != TK_Number)
-    {
-      fprintf(stderr, "The first token is not number. The first token shall be a number");
-      exit(1);
-    }
-    result->expr_kind = EK_Number;
-    result->value = token.value;
-  }
-  for (Token *ptr = tokens + 1; ptr < token_end;)
-  {
-    Token maybe_operator = *ptr;
+    Token maybe_operator = *tokens;
     switch (maybe_operator.kind)
     {
     case TK_Number:
@@ -151,29 +154,67 @@ Expr *parseExpr(Token **ptrptr, Token *token_end)
       fprintf(stderr, "Expected operator got Number");
       exit(1);
     }
+    case TK_Mul:
+    {
+      tokens++;
+      Expr *numberexp = parsePrimary(&tokens, token_end);
+      result = binaryExpr(result, numberexp, BO_Mul);
+      // ptr++;
+      break;
+    }
+    default:
+      *ptrptr = tokens;
+      return result;
+      break;
+    }
+  }
+  *ptrptr = tokens;
+  return result;
+}
+
+Expr *parseAdditive(Token **ptrptr, Token *token_end)
+{
+  Token *tokens = *ptrptr;
+  if (token_end == tokens)
+  {
+    fprintf(stderr, "No token found");
+    exit(1);
+  }
+  Expr *result = parseMultiplicative(&tokens, token_end);
+
+  for (; tokens < token_end;)
+  {
+    Token maybe_operator = *tokens;
+    switch (maybe_operator.kind)
+    {
+    case TK_Number:
+    {
+      fprintf(stderr, "Expected operator got Number");
+      exit(1);
+    }
+    case TK_Minus:
+    {
+      tokens++;
+      Expr *numberexp = parseMultiplicative(&tokens, token_end);
+      result = binaryExpr(result, numberexp, BO_Sub);
+      // ptr++;
+      break;
+    }
     case TK_Plus:
     {
-      ptr++;
-      Expr *numberexp = parsePrimary(&ptr, token_end);
+      tokens++;
+      Expr *numberexp = parseMultiplicative(&tokens, token_end);
       result = binaryExpr(result, numberexp, BO_Add);
       // ptr++;
       break;
     }
-    case TK_Minus:
-    {
-      ptr++;
-      Expr *numberexp = parsePrimary(&ptr, token_end);
-      result = binaryExpr(result, numberexp, BO_Sub);
-      // ptr++;
-
-      break;
-    }
     default:
-      fprintf(stderr, "Invalid token:%d", maybe_operator.kind);
-      exit(1);
+      *ptrptr = tokens;
+      return result;
       break;
     }
   }
+  *ptrptr = tokens;
   return result;
 }
 

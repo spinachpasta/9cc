@@ -36,4 +36,9 @@ assert check("   111   + 10 -     42", 111+10-42)
 
 assert check("   0 +    10+    3",  0 +    10+    3)
 
+assert check("10*2", 10*2)
+
+assert check("10+1*2", 10+1*2)
+assert check("10+3*2+10-5", 10+3*2+10-5)
+
 print("OK")
