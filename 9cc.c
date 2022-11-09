@@ -24,9 +24,10 @@ typedef struct Expr
 
 enum TokenKind
 {
-  Number,
-  Minus,
-  Plus
+  TK_Number,
+  TK_Minus,
+  TK_Plus,
+  TK_Mul
 };
 
 typedef struct Token
@@ -96,7 +97,7 @@ Expr *parseExpr(int token_length)
   }
   {
     Token token = tokens[0];
-    if (token.kind != Number)
+    if (token.kind != TK_Number)
     {
       fprintf(stderr, "The first token is not number. The first token shall be a number");
       exit(1);
@@ -109,12 +110,12 @@ Expr *parseExpr(int token_length)
     Token maybe_operator = tokens[i];
     switch (maybe_operator.kind)
     {
-    case Number:
+    case TK_Number:
     {
       fprintf(stderr, "Expected operator got Number");
       exit(1);
     }
-    case Plus:
+    case TK_Plus:
     {
       i++;
       if (i >= token_length)
@@ -124,7 +125,7 @@ Expr *parseExpr(int token_length)
       }
 
       Token maybe_number = tokens[i];
-      if (maybe_number.kind != Number)
+      if (maybe_number.kind != TK_Number)
       {
         fprintf(stderr, "Expected: number. Token Kind:%d", maybe_number.kind);
         exit(1);
@@ -146,7 +147,7 @@ Expr *parseExpr(int token_length)
 
       break;
     }
-    case Minus:
+    case TK_Minus:
     {
       i++;
       if (i >= token_length)
@@ -156,7 +157,7 @@ Expr *parseExpr(int token_length)
       }
 
       Token maybe_number = tokens[i];
-      if (maybe_number.kind != Number)
+      if (maybe_number.kind != TK_Number)
       {
         fprintf(stderr, "Expected: number. Token Kind:%d", maybe_number.kind);
         exit(1);
@@ -198,7 +199,7 @@ int tokenize(char *str)
     case '+':
     {
       /* code */
-      Token token = {Plus, 0};
+      Token token = {TK_Plus, 0};
       tokens[token_index] = token;
       token_index++;
       i++;
@@ -207,7 +208,7 @@ int tokenize(char *str)
     case '-':
     {
       /* code */
-      Token token = {Minus, 0};
+      Token token = {TK_Minus, 0};
       tokens[token_index] = token;
       token_index++;
       i++;
@@ -227,7 +228,7 @@ int tokenize(char *str)
       int parsednum = parseInt(&str[i]);
       int parsedlength = intLength(&str[i]);
       i += parsedlength;
-      Token token = {Number, parsednum};
+      Token token = {TK_Number, parsednum};
       tokens[token_index] = token;
       token_index++;
       break;
