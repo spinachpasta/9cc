@@ -92,6 +92,7 @@ Expr *numberexpr(int value)
   Expr *numberexp = calloc(1, sizeof(Expr));
   numberexp->value = value;
   numberexp->expr_kind = EK_Number;
+  return numberexp;
 }
 
 Expr *binaryExpr(Expr *first_child, Expr *second_child, enum BinaryOperation binaryop)
@@ -102,6 +103,17 @@ Expr *binaryExpr(Expr *first_child, Expr *second_child, enum BinaryOperation bin
   newexp->binary_op = binaryop;
   newexp->second_child = second_child;
   return newexp;
+}
+
+Expr *parsePrimary(Token maybe_number)
+{
+  if (maybe_number.kind != TK_Number)
+  {
+    fprintf(stderr, "Expected: number. Token Kind:%d", maybe_number.kind);
+    exit(1);
+  }
+
+  return numberexpr(maybe_number.value);
 }
 
 Expr *parseExpr(int token_length)
@@ -140,15 +152,7 @@ Expr *parseExpr(int token_length)
         fprintf(stderr, "Expected: number, but got EOF");
         exit(1);
       }
-
-      Token maybe_number = tokens[i];
-      if (maybe_number.kind != TK_Number)
-      {
-        fprintf(stderr, "Expected: number. Token Kind:%d", maybe_number.kind);
-        exit(1);
-      }
-
-      Expr *numberexp = numberexpr(maybe_number.value);
+      Expr *numberexp = parsePrimary(tokens[i]);
       result = binaryExpr(result, numberexp, BO_Add);
       i++;
       break;
@@ -162,14 +166,7 @@ Expr *parseExpr(int token_length)
         exit(1);
       }
 
-      Token maybe_number = tokens[i];
-      if (maybe_number.kind != TK_Number)
-      {
-        fprintf(stderr, "Expected: number. Token Kind:%d", maybe_number.kind);
-        exit(1);
-      }
-
-      Expr *numberexp = numberexpr(maybe_number.value);
+      Expr *numberexp = parsePrimary(tokens[i]);
       result = binaryExpr(result, numberexp, BO_Sub);
       i++;
 
