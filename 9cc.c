@@ -134,9 +134,9 @@ Expr *parseExpr(int token_length)
     result->expr_kind = EK_Number;
     result->value = token.value;
   }
-  for (int i = 1; i < token_length;)
+  for (Token *ptr = tokens + 1; ptr < tokens + token_length;)
   {
-    Token maybe_operator = tokens[i];
+    Token maybe_operator = *ptr;
     switch (maybe_operator.kind)
     {
     case TK_Number:
@@ -146,29 +146,29 @@ Expr *parseExpr(int token_length)
     }
     case TK_Plus:
     {
-      i++;
-      if (i >= token_length)
+      ptr++;
+      if (ptr >= token_length + tokens)
       {
         fprintf(stderr, "Expected: number, but got EOF");
         exit(1);
       }
-      Expr *numberexp = parsePrimary(tokens[i]);
+      Expr *numberexp = parsePrimary(*ptr);
       result = binaryExpr(result, numberexp, BO_Add);
-      i++;
+      ptr++;
       break;
     }
     case TK_Minus:
     {
-      i++;
-      if (i >= token_length)
+      ptr++;
+      if (ptr >= token_length + tokens)
       {
         fprintf(stderr, "Expected: number, but got EOF");
         exit(1);
       }
 
-      Expr *numberexp = parsePrimary(tokens[i]);
+      Expr *numberexp = parsePrimary(*ptr);
       result = binaryExpr(result, numberexp, BO_Sub);
-      i++;
+      ptr++;
 
       break;
     }
