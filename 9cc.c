@@ -105,15 +105,16 @@ Expr *binaryExpr(Expr *first_child, Expr *second_child, enum BinaryOperation bin
   return newexp;
 }
 
-Expr *parsePrimary(Token maybe_number)
+Expr *parsePrimary(Token **ptrptr)
 {
-  if (maybe_number.kind != TK_Number)
+  Token *maybe_number = *ptrptr;
+  if (maybe_number->kind != TK_Number)
   {
-    fprintf(stderr, "Expected: number. Token Kind:%d", maybe_number.kind);
+    fprintf(stderr, "Expected: number. Token Kind:%d", maybe_number->kind);
     exit(1);
   }
-
-  return numberexpr(maybe_number.value);
+  *ptrptr += 1;
+  return numberexpr(maybe_number->value);
 }
 
 Expr *parseExpr(int token_length)
@@ -152,9 +153,9 @@ Expr *parseExpr(int token_length)
         fprintf(stderr, "Expected: number, but got EOF");
         exit(1);
       }
-      Expr *numberexp = parsePrimary(*ptr);
+      Expr *numberexp = parsePrimary(&ptr);
       result = binaryExpr(result, numberexp, BO_Add);
-      ptr++;
+      // ptr++;
       break;
     }
     case TK_Minus:
@@ -166,9 +167,9 @@ Expr *parseExpr(int token_length)
         exit(1);
       }
 
-      Expr *numberexp = parsePrimary(*ptr);
+      Expr *numberexp = parsePrimary(&ptr);
       result = binaryExpr(result, numberexp, BO_Sub);
-      ptr++;
+      // ptr++;
 
       break;
     }
