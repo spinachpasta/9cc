@@ -1,6 +1,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+enum BinaryOperation
+{
+  BO_Add,
+  BO_Sub
+};
+
+enum ExprKind
+{
+  EK_Number,
+  EK_Operator
+};
+
+typedef struct Expr
+{
+  enum BinaryOperation binary_op;
+  enum ExprKind expr_kind;
+  int value;
+  struct Expr *first_child;
+  struct Expr *second_child;
+} Expr;
+
 enum TokenKind
 {
   Number,
@@ -16,8 +37,155 @@ typedef struct Token
 
 int isDigit(char c);
 int intLength(char *str);
+int parseInt(char *str);
 
 Token tokens[1000];
+
+void EvaluateExprIntoRax(Expr *expr)
+{
+  switch (expr->expr_kind)
+  {
+  case EK_Number:
+    printf("  mov rax, %d\n", expr->value);
+    break;
+  case EK_Operator:
+    EvaluateExprIntoRax(expr->first_child);
+    printf("    push rax\n");
+    EvaluateExprIntoRax(expr->second_child);
+    printf("    push rax\n");
+
+    printf("    pop rdi\n");
+    printf("    pop rax\n");
+
+    switch (expr->binary_op)
+    {
+    case BO_Add:
+    {
+      printf("    add rax,rdi\n");
+      break;
+    }
+    case BO_Sub:
+    {
+      printf("    sub rax,rdi\n");
+      break;
+    }
+
+    default:
+    {
+      fprintf(stderr, "Invalid binaryop kind:%d", expr->binary_op);
+      exit(1);
+      break;
+    }
+    }
+    break;
+
+  default:
+    fprintf(stderr, "Invalid expr kind:%d", expr->expr_kind);
+    exit(1);
+    break;
+  }
+}
+
+Expr *parseExpr(int token_length)
+{
+  Expr *result = calloc(1, sizeof(Expr));
+  if (token_length == 0)
+  {
+    fprintf(stderr, "No token found");
+    exit(1);
+  }
+  {
+    Token token = tokens[0];
+    if (token.kind != Number)
+    {
+      fprintf(stderr, "The first token is not number. The first token shall be a number");
+      exit(1);
+    }
+    result->expr_kind = EK_Number;
+    result->value = token.value;
+  }
+  for (int i = 1; i < token_length;)
+  {
+    Token maybe_operator = tokens[i];
+    switch (maybe_operator.kind)
+    {
+    case Number:
+    {
+      fprintf(stderr, "Expected operator got Number");
+      exit(1);
+    }
+    case Plus:
+    {
+      i++;
+      if (i >= token_length)
+      {
+        fprintf(stderr, "Expected: number, but got EOF");
+        exit(1);
+      }
+
+      Token maybe_number = tokens[i];
+      if (maybe_number.kind != Number)
+      {
+        fprintf(stderr, "Expected: number. Token Kind:%d", maybe_number.kind);
+        exit(1);
+      }
+      Expr *newexp = calloc(1, sizeof(Expr));
+      newexp->first_child = result;
+      newexp->expr_kind = EK_Operator;
+      newexp->binary_op = BO_Add;
+
+      Expr *numberexp = calloc(1, sizeof(Expr));
+      numberexp->value = maybe_number.value;
+      numberexp->expr_kind = EK_Number;
+
+      newexp->second_child = numberexp;
+
+      result = newexp;
+      // printf("  add rax, %d\n", maybe_number.value);
+      i++;
+
+      break;
+    }
+    case Minus:
+    {
+      i++;
+      if (i >= token_length)
+      {
+        fprintf(stderr, "Expected: number, but got EOF");
+        exit(1);
+      }
+
+      Token maybe_number = tokens[i];
+      if (maybe_number.kind != Number)
+      {
+        fprintf(stderr, "Expected: number. Token Kind:%d", maybe_number.kind);
+        exit(1);
+      }
+      Expr *newexp = calloc(1, sizeof(Expr));
+      newexp->first_child = result;
+      newexp->expr_kind = EK_Operator;
+      newexp->binary_op = BO_Sub;
+
+      Expr *numberexp = calloc(1, sizeof(Expr));
+      numberexp->value = maybe_number.value;
+      numberexp->expr_kind = EK_Number;
+
+      newexp->second_child = numberexp;
+
+      result = newexp;
+      // printf("  add rax, %d\n", maybe_number.value);
+      i++;
+
+      break;
+    }
+    default:
+      fprintf(stderr, "Invalid token:%d", maybe_operator.kind);
+      exit(1);
+      break;
+    }
+  }
+  return result;
+}
 
 int tokenize(char *str)
 {
@@ -137,69 +305,9 @@ int main(int argc, char **argv)
   printf(".intel_syntax noprefix\n");
   printf(".globl main\n");
   printf("main:\n");
-  {
-    Token token = tokens[0];
-    if (token.kind != Number)
-    {
-      fprintf(stderr, "The first token is not number. The first token shall be a number");
-      return 1;
-    }
-    printf("  mov rax, %d\n", token.value);
-  }
-  for (int i = 1; i < token_length;)
-  {
-    Token maybe_operator = tokens[i];
-    switch (maybe_operator.kind)
-    {
-    case Number:
-    {
-      fprintf(stderr, "Expected operator got Number");
-      return 1;
-    }
-    case Plus:
-    {
-      i++;
-      if (i >= token_length)
-      {
-        fprintf(stderr, "Expected: number, but got EOF");
-        return 1;
-      }
-
-      Token maybe_number = tokens[i];
-      if (maybe_number.kind != Number)
-      {
-        fprintf(stderr, "Expected: number. Token Kind:%d", maybe_number.kind);
-        return 1;
-      }
-      printf("  add rax, %d\n", maybe_number.value);
-      i++;
-
-      break;
-    }
-    case Minus:
-    {
-      i++;
-      if (i >= token_length)
-      {
-        fprintf(stderr, "Expected: number, but got EOF");
-        return 1;
-      }
-      Token maybe_number = tokens[i];
-      if (maybe_number.kind != Number)
-      {
-        fprintf(stderr, "Expected: number. Token Kind:%d", maybe_number.kind);
-        return 1;
-      }
-      printf("  sub rax, %d\n", maybe_number.value);
-      i++;
-      break;
-    }
-    default:
-      fprintf(stderr, "Invalid token:%d", maybe_operator.kind);
-      return 1;
-      break;
-    }
-  }
+  
+  Expr* expr=parseExpr(token_length);
+  EvaluateExprIntoRax(expr);
   printf("  ret\n");
   return 0;
 }
