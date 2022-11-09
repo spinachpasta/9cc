@@ -117,8 +117,9 @@ Expr *parsePrimary(Token **ptrptr)
   return numberexpr(maybe_number->value);
 }
 
-Expr *parseExpr(Token* token_end)
+Expr *parseExpr(Token **ptrptr, Token *token_end)
 {
+  Token *tokens = *ptrptr;
   Expr *result = calloc(1, sizeof(Expr));
   if (token_end == tokens)
   {
@@ -309,9 +310,9 @@ int main(int argc, char **argv)
   printf(".intel_syntax noprefix\n");
   printf(".globl main\n");
   printf("main:\n");
-
-  Token* token_end=tokens+token_length;
-  Expr *expr = parseExpr(token_end);
+  Token *ptr = tokens;
+  Token *token_end = tokens + token_length;
+  Expr *expr = parseExpr(&ptr,token_end);
   EvaluateExprIntoRax(expr);
   printf("  ret\n");
   return 0;
