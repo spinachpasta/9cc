@@ -120,7 +120,8 @@ Expr *parsePrimary(Token **ptrptr)
 Expr *parseExpr(int token_length)
 {
   Expr *result = calloc(1, sizeof(Expr));
-  if (token_length == 0)
+  Token* token_end=tokens+token_length;
+  if (token_end == tokens)
   {
     fprintf(stderr, "No token found");
     exit(1);
@@ -135,7 +136,7 @@ Expr *parseExpr(int token_length)
     result->expr_kind = EK_Number;
     result->value = token.value;
   }
-  for (Token *ptr = tokens + 1; ptr < tokens + token_length;)
+  for (Token *ptr = tokens + 1; ptr < token_end;)
   {
     Token maybe_operator = *ptr;
     switch (maybe_operator.kind)
@@ -148,7 +149,7 @@ Expr *parseExpr(int token_length)
     case TK_Plus:
     {
       ptr++;
-      if (ptr >= token_length + tokens)
+      if (ptr >= token_end)
       {
         fprintf(stderr, "Expected: number, but got EOF");
         exit(1);
@@ -161,7 +162,7 @@ Expr *parseExpr(int token_length)
     case TK_Minus:
     {
       ptr++;
-      if (ptr >= token_length + tokens)
+      if (ptr >= token_end)
       {
         fprintf(stderr, "Expected: number, but got EOF");
         exit(1);
