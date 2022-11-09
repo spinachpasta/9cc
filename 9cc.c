@@ -87,6 +87,23 @@ void EvaluateExprIntoRax(Expr *expr)
   }
 }
 
+Expr *numberexpr(int value)
+{
+  Expr *numberexp = calloc(1, sizeof(Expr));
+  numberexp->value = value;
+  numberexp->expr_kind = EK_Number;
+}
+
+Expr *binaryExpr(Expr *first_child, Expr *second_child, enum BinaryOperation binaryop)
+{
+  Expr *newexp = calloc(1, sizeof(Expr));
+  newexp->first_child = first_child;
+  newexp->expr_kind = EK_Operator;
+  newexp->binary_op = binaryop;
+  newexp->second_child = second_child;
+  return newexp;
+}
+
 Expr *parseExpr(int token_length)
 {
   Expr *result = calloc(1, sizeof(Expr));
@@ -130,21 +147,10 @@ Expr *parseExpr(int token_length)
         fprintf(stderr, "Expected: number. Token Kind:%d", maybe_number.kind);
         exit(1);
       }
-      Expr *newexp = calloc(1, sizeof(Expr));
-      newexp->first_child = result;
-      newexp->expr_kind = EK_Operator;
-      newexp->binary_op = BO_Add;
 
-      Expr *numberexp = calloc(1, sizeof(Expr));
-      numberexp->value = maybe_number.value;
-      numberexp->expr_kind = EK_Number;
-
-      newexp->second_child = numberexp;
-
-      result = newexp;
-      // printf("  add rax, %d\n", maybe_number.value);
+      Expr *numberexp = numberexpr(maybe_number.value);
+      result = binaryExpr(result, numberexp, BO_Add);
       i++;
-
       break;
     }
     case TK_Minus:
@@ -162,19 +168,9 @@ Expr *parseExpr(int token_length)
         fprintf(stderr, "Expected: number. Token Kind:%d", maybe_number.kind);
         exit(1);
       }
-      Expr *newexp = calloc(1, sizeof(Expr));
-      newexp->first_child = result;
-      newexp->expr_kind = EK_Operator;
-      newexp->binary_op = BO_Sub;
 
-      Expr *numberexp = calloc(1, sizeof(Expr));
-      numberexp->value = maybe_number.value;
-      numberexp->expr_kind = EK_Number;
-
-      newexp->second_child = numberexp;
-
-      result = newexp;
-      // printf("  add rax, %d\n", maybe_number.value);
+      Expr *numberexp = numberexpr(maybe_number.value);
+      result = binaryExpr(result, numberexp, BO_Sub);
       i++;
 
       break;
@@ -209,6 +205,15 @@ int tokenize(char *str)
     {
       /* code */
       Token token = {TK_Minus, 0};
+      tokens[token_index] = token;
+      token_index++;
+      i++;
+      break;
+    }
+    case '*':
+    {
+      /* code */
+      Token token = {TK_Mul, 0};
       tokens[token_index] = token;
       token_index++;
       i++;
@@ -306,8 +311,8 @@ int main(int argc, char **argv)
   printf(".intel_syntax noprefix\n");
   printf(".globl main\n");
   printf("main:\n");
-  
-  Expr* expr=parseExpr(token_length);
+
+  Expr *expr = parseExpr(token_length);
   EvaluateExprIntoRax(expr);
   printf("  ret\n");
   return 0;
