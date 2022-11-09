@@ -105,9 +105,14 @@ Expr *binaryExpr(Expr *first_child, Expr *second_child, enum BinaryOperation bin
   return newexp;
 }
 
-Expr *parsePrimary(Token **ptrptr)
+Expr *parsePrimary(Token **ptrptr, Token *token_end)
 {
   Token *maybe_number = *ptrptr;
+  if (maybe_number >= token_end)
+  {
+    fprintf(stderr, "Expected: number, but got EOF");
+    exit(1);
+  }
   if (maybe_number->kind != TK_Number)
   {
     fprintf(stderr, "Expected: number. Token Kind:%d", maybe_number->kind);
@@ -149,12 +154,7 @@ Expr *parseExpr(Token **ptrptr, Token *token_end)
     case TK_Plus:
     {
       ptr++;
-      if (ptr >= token_end)
-      {
-        fprintf(stderr, "Expected: number, but got EOF");
-        exit(1);
-      }
-      Expr *numberexp = parsePrimary(&ptr);
+      Expr *numberexp = parsePrimary(&ptr, token_end);
       result = binaryExpr(result, numberexp, BO_Add);
       // ptr++;
       break;
@@ -162,13 +162,7 @@ Expr *parseExpr(Token **ptrptr, Token *token_end)
     case TK_Minus:
     {
       ptr++;
-      if (ptr >= token_end)
-      {
-        fprintf(stderr, "Expected: number, but got EOF");
-        exit(1);
-      }
-
-      Expr *numberexp = parsePrimary(&ptr);
+      Expr *numberexp = parsePrimary(&ptr, token_end);
       result = binaryExpr(result, numberexp, BO_Sub);
       // ptr++;
 
@@ -312,7 +306,7 @@ int main(int argc, char **argv)
   printf("main:\n");
   Token *ptr = tokens;
   Token *token_end = tokens + token_length;
-  Expr *expr = parseExpr(&ptr,token_end);
+  Expr *expr = parseExpr(&ptr, token_end);
   EvaluateExprIntoRax(expr);
   printf("  ret\n");
   return 0;
