@@ -12,7 +12,7 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 def check(input: str, expected: int):
-    os.system(f"./9cc {input} > tmp.s")
+    os.system(f'./9cc "{input}" > tmp.s')
     os.system("cc -o tmp tmp.s")
     returned_value = (os.system("./tmp") >> 8) & 0xff
 
@@ -31,5 +31,9 @@ assert check("42", 42)
 assert check("0+10+3", 0+10+3)
 
 assert check("111+10-42", 111+10-42)
+
+assert check("   111   + 10 -     42", 111+10-42)
+
+assert check("   0 +    10+    3",  0 +    10+    3)
 
 print("OK")
