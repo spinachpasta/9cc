@@ -28,7 +28,9 @@ enum TokenKind
   TK_Number,
   TK_Minus,
   TK_Plus,
-  TK_Mul
+  TK_Mul,
+  TK_LeftParenthesis,
+  TK_RightParenthesis,
 };
 
 typedef struct Token
@@ -43,6 +45,7 @@ int intLength(char *str);
 int parseInt(char *str);
 Expr *parseMultiplicative(Token **ptrptr, Token *token_end);
 Expr *parseAdditive(Token **ptrptr, Token *token_end);
+Expr *parseExpr(Token **ptrptr, Token *token_end);
 
 Token tokens[1000];
 
@@ -123,6 +126,20 @@ Expr *parsePrimary(Token **ptrptr, Token *token_end)
   }
   if (maybe_number->kind != TK_Number)
   {
+    Token *maybe_leftparenthesis = maybe_number;
+    if (maybe_leftparenthesis->kind == TK_LeftParenthesis)
+    {
+      *ptrptr += 1;
+      Expr *expr = parseExpr(ptrptr, token_end);
+      Token *maybe_rightparenthesis = *ptrptr;
+      if (maybe_rightparenthesis->kind != TK_RightParenthesis)
+      {
+        fprintf(stderr, "Expected: right parenthesis. Token Kind:%d", maybe_rightparenthesis->kind);
+        exit(1);
+      }
+      *ptrptr += 1;
+      return expr;
+    }
     fprintf(stderr, "Expected: number. Token Kind:%d", maybe_number->kind);
     exit(1);
   }
@@ -230,6 +247,24 @@ int tokenize(char *str)
     {
       /* code */
       Token token = {TK_Plus, 0};
+      tokens[token_index] = token;
+      token_index++;
+      i++;
+      break;
+    }
+    case '(':
+    {
+      /* code */
+      Token token = {TK_LeftParenthesis, 0};
+      tokens[token_index] = token;
+      token_index++;
+      i++;
+      break;
+    }
+    case ')':
+    {
+      /* code */
+      Token token = {TK_RightParenthesis, 0};
       tokens[token_index] = token;
       token_index++;
       i++;
