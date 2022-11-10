@@ -154,11 +154,37 @@ Expr *parsePrimary(Token **ptrptr, Token *token_end)
   *ptrptr += 1;
   return numberexpr(maybe_number->value);
 }
+//unary   = ("+" | "-")? primary
+Expr *parseUnary(Token **ptrptr, Token *token_end)
+{
+  Token *maybe_unary = *ptrptr;
+  if (maybe_unary >= token_end)
+  {
+    fprintf(stderr, "Expected: number, but got EOF");
+    exit(1);
+  }
+  if (maybe_unary->kind == TK_Plus)
+  {
+    *ptrptr += 1;
+    return parsePrimary(ptrptr, token_end);
+  }
+  if (maybe_unary->kind == TK_Minus)
+  {
+    *ptrptr += 1;
+    return binaryExpr(numberexpr(0),parsePrimary(ptrptr, token_end),BO_Sub);
+  }
+  return parsePrimary(ptrptr, token_end);
+}
 
+
+// expr = additive
 Expr *parseExpr(Token **ptrptr, Token *token_end)
 {
   return parseAdditive(ptrptr, token_end);
 }
+
+
+// mul = unary ("*" unary | "/" unary)*
 Expr *parseMultiplicative(Token **ptrptr, Token *token_end)
 {
   Token *tokens = *ptrptr;
@@ -167,7 +193,7 @@ Expr *parseMultiplicative(Token **ptrptr, Token *token_end)
     fprintf(stderr, "No token found");
     exit(1);
   }
-  Expr *result = parsePrimary(&tokens, token_end);
+  Expr *result = parseUnary(&tokens, token_end);
 
   for (; tokens < token_end;)
   {
@@ -182,7 +208,7 @@ Expr *parseMultiplicative(Token **ptrptr, Token *token_end)
     case TK_Mul:
     {
       tokens++;
-      Expr *numberexp = parsePrimary(&tokens, token_end);
+      Expr *numberexp = parseUnary(&tokens, token_end);
       result = binaryExpr(result, numberexp, BO_Mul);
       // ptr++;
       break;
@@ -190,7 +216,7 @@ Expr *parseMultiplicative(Token **ptrptr, Token *token_end)
     case TK_Div:
     {
       tokens++;
-      Expr *numberexp = parsePrimary(&tokens, token_end);
+      Expr *numberexp = parseUnary(&tokens, token_end);
       result = binaryExpr(result, numberexp, BO_Div);
       // ptr++;
       break;
@@ -205,6 +231,7 @@ Expr *parseMultiplicative(Token **ptrptr, Token *token_end)
   return result;
 }
 
+// additive = mul ("+" mul | "-" mul)*
 Expr *parseAdditive(Token **ptrptr, Token *token_end)
 {
   Token *tokens = *ptrptr;

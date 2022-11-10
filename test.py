@@ -49,4 +49,9 @@ assert check("(10+1)/2", (10+1)//2)
 assert check("(15+1)/2+3", (15+1)//2+3)
 assert check("10+1 /2/5", 10+1//2//5)
 
+#unary
+assert check("-10+1 /2/5+30", -10+1//2//5+30)
+assert check("+10+1 /2/5", +10+1//2//5)
+assert check("-2*-3", -2*-3)
+
 print("OK")
