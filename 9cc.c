@@ -5,7 +5,8 @@ enum BinaryOperation
 {
   BO_Add,
   BO_Sub,
-  BO_Mul
+  BO_Mul,
+  BO_Div
 };
 
 enum ExprKind
@@ -29,6 +30,7 @@ enum TokenKind
   TK_Minus,
   TK_Plus,
   TK_Mul,
+  TK_Div,
   TK_LeftParenthesis,
   TK_RightParenthesis,
 };
@@ -80,6 +82,12 @@ void EvaluateExprIntoRax(Expr *expr)
     case BO_Mul:
     {
       printf("    imul rax,rdi\n");
+      break;
+    }
+    case BO_Div:
+    {
+      printf("  cqo\n");
+      printf("  idiv rdi\n");
       break;
     }
     default:
@@ -176,6 +184,14 @@ Expr *parseMultiplicative(Token **ptrptr, Token *token_end)
       tokens++;
       Expr *numberexp = parsePrimary(&tokens, token_end);
       result = binaryExpr(result, numberexp, BO_Mul);
+      // ptr++;
+      break;
+    }
+    case TK_Div:
+    {
+      tokens++;
+      Expr *numberexp = parsePrimary(&tokens, token_end);
+      result = binaryExpr(result, numberexp, BO_Div);
       // ptr++;
       break;
     }
@@ -283,6 +299,15 @@ int tokenize(char *str)
     {
       /* code */
       Token token = {TK_Mul, 0};
+      tokens[token_index] = token;
+      token_index++;
+      i++;
+      break;
+    }
+    case '/':
+    {
+      /* code */
+      Token token = {TK_Div, 0};
       tokens[token_index] = token;
       token_index++;
       i++;
