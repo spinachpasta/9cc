@@ -54,4 +54,10 @@ assert check("-10+1 /2/5+30", -10+1//2//5+30)
 assert check("+10+1 /2/5", +10+1//2//5)
 assert check("-2*-3", -2*-3)
 
+#equality
+assert check("1==0", 0)
+assert check("1==1", 1)
+assert check("1==1+5", 0)
+assert check("1+(1+1==1+1)",2)
+
 print("OK")

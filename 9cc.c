@@ -6,7 +6,8 @@ enum BinaryOperation
   BO_Add,
   BO_Sub,
   BO_Mul,
-  BO_Div
+  BO_Div,
+  BO_Equal,
 };
 
 enum ExprKind
@@ -33,6 +34,7 @@ enum TokenKind
   TK_Div,
   TK_LeftParenthesis,
   TK_RightParenthesis,
+  TK_Equal,
 };
 
 typedef struct Token
@@ -48,6 +50,7 @@ int parseInt(char *str);
 Expr *parseMultiplicative(Token **ptrptr, Token *token_end);
 Expr *parseAdditive(Token **ptrptr, Token *token_end);
 Expr *parseExpr(Token **ptrptr, Token *token_end);
+Expr *parseUnary(Token **ptrptr, Token *token_end);
 
 Token tokens[1000];
 
@@ -90,6 +93,13 @@ void EvaluateExprIntoRax(Expr *expr)
       printf("  idiv rdi\n");
       break;
     }
+    case BO_Equal:
+    {
+      printf("  cmp rax, rdi\n");
+      printf("  sete al\n");
+      printf("  movzb rax, al\n");
+      break;
+    }
     default:
     {
       fprintf(stderr, "Invalid binaryop kind:%d", expr->binary_op);
@@ -124,6 +134,44 @@ Expr *binaryExpr(Expr *first_child, Expr *second_child, enum BinaryOperation bin
   return newexp;
 }
 
+// relational = add ("<" add | "<=" add | ">" add | ">=" add)*
+Expr *parseRelational(Token **ptrptr, Token *token_end)
+{
+  return parseAdditive(ptrptr, token_end);
+}
+// equality   = relational ("==" relational | "!=" relational)*
+Expr *parseEquality(Token **ptrptr, Token *token_end)
+{
+  Token *tokens = *ptrptr;
+  if (token_end == tokens)
+  {
+    fprintf(stderr, "No token found");
+    exit(1);
+  }
+  Expr *result = parseRelational(&tokens, token_end);
+
+  for (; tokens < token_end;)
+  {
+    Token maybe_relational = *tokens;
+    switch (maybe_relational.kind)
+    {
+    case TK_Equal:
+    {
+      tokens++;
+      Expr *numberexp = parseRelational(&tokens, token_end);
+      result = binaryExpr(result, numberexp, BO_Equal);
+      break;
+    }
+    default:
+      *ptrptr = tokens;
+      return result;
+      break;
+    }
+  }
+  *ptrptr = tokens;
+  return result;
+}
+
 Expr *parsePrimary(Token **ptrptr, Token *token_end)
 {
   Token *maybe_number = *ptrptr;
@@ -154,7 +202,7 @@ Expr *parsePrimary(Token **ptrptr, Token *token_end)
   *ptrptr += 1;
   return numberexpr(maybe_number->value);
 }
-//unary   = ("+" | "-")? primary
+// unary   = ("+" | "-")? primary
 Expr *parseUnary(Token **ptrptr, Token *token_end)
 {
   Token *maybe_unary = *ptrptr;
@@ -171,18 +219,16 @@ Expr *parseUnary(Token **ptrptr, Token *token_end)
   if (maybe_unary->kind == TK_Minus)
   {
     *ptrptr += 1;
-    return binaryExpr(numberexpr(0),parsePrimary(ptrptr, token_end),BO_Sub);
+    return binaryExpr(numberexpr(0), parsePrimary(ptrptr, token_end), BO_Sub);
   }
   return parsePrimary(ptrptr, token_end);
 }
 
-
-// expr = additive
+// expr       = equality
 Expr *parseExpr(Token **ptrptr, Token *token_end)
 {
-  return parseAdditive(ptrptr, token_end);
+  return parseEquality(ptrptr, token_end);
 }
-
 
 // mul = unary ("*" unary | "/" unary)*
 Expr *parseMultiplicative(Token **ptrptr, Token *token_end)
@@ -315,7 +361,6 @@ int tokenize(char *str)
     }
     case '-':
     {
-      /* code */
       Token token = {TK_Minus, 0};
       tokens[token_index] = token;
       token_index++;
@@ -333,11 +378,26 @@ int tokenize(char *str)
     }
     case '/':
     {
-      /* code */
       Token token = {TK_Div, 0};
       tokens[token_index] = token;
       token_index++;
       i++;
+      break;
+    }
+    //==
+    case '=':
+    {
+      i++;
+      char c = str[i];
+      if (c != '=')
+      {
+        fprintf(stderr, "%s: unknown token =%c(%d)\n", __FUNCTION__, c, c);
+        return -1;
+      }
+      i++;
+      Token token = {TK_Equal, 0};
+      tokens[token_index] = token;
+      token_index++;
       break;
     }
     case '0':
