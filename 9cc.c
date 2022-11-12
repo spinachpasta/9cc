@@ -9,7 +9,8 @@ enum BinaryOperation
   BO_Div,
   BO_Equal,
   BO_Greater,
-  BO_GreaterEqual
+  BO_GreaterEqual,
+  BO_NotEqual
 };
 
 enum ExprKind
@@ -37,6 +38,7 @@ enum TokenKind
   TK_LeftParenthesis,
   TK_RightParenthesis,
   TK_Equal,
+  TK_NotEqual,
   TK_Greater,
   TK_GreaterEqual,
   TK_Less,
@@ -103,6 +105,13 @@ void EvaluateExprIntoRax(Expr *expr)
     {
       printf("  cmp rax, rdi\n");
       printf("  sete al\n");
+      printf("  movzb rax, al\n");
+      break;
+    }
+    case BO_NotEqual:
+    {
+      printf("  cmp rax, rdi\n");
+      printf("  setne al\n");
       printf("  movzb rax, al\n");
       break;
     }
@@ -188,16 +197,16 @@ Expr *parseRelational(Token **ptrptr, Token *token_end)
     {
       tokens++;
       Expr *numberexp = parseAdditive(&tokens, token_end);
-      //swap children of operator node
-      result = binaryExpr(numberexp,result, BO_Greater);
+      // swap children of operator node
+      result = binaryExpr(numberexp, result, BO_Greater);
       break;
     }
     case TK_LessEqual:
     {
       tokens++;
       Expr *numberexp = parseAdditive(&tokens, token_end);
-      //swap children of operator node
-      result = binaryExpr(numberexp,result, BO_GreaterEqual);
+      // swap children of operator node
+      result = binaryExpr(numberexp, result, BO_GreaterEqual);
       break;
     }
     default:
@@ -230,6 +239,13 @@ Expr *parseEquality(Token **ptrptr, Token *token_end)
       tokens++;
       Expr *numberexp = parseRelational(&tokens, token_end);
       result = binaryExpr(result, numberexp, BO_Equal);
+      break;
+    }
+    case TK_NotEqual:
+    {
+      tokens++;
+      Expr *numberexp = parseRelational(&tokens, token_end);
+      result = binaryExpr(result, numberexp, BO_NotEqual);
       break;
     }
     default:
@@ -501,6 +517,21 @@ int tokenize(char *str)
       }
       i++;
       Token token = {TK_Equal, 0};
+      tokens[token_index] = token;
+      token_index++;
+      break;
+    }
+    case '!':
+    {
+      i++;
+      char c = str[i];
+      if (c != '=')
+      {
+        fprintf(stderr, "%s: unknown token !%c(%d)\n", __FUNCTION__, c, c);
+        return -1;
+      }
+      i++;
+      Token token = {TK_NotEqual, 0};
       tokens[token_index] = token;
       token_index++;
       break;
