@@ -61,5 +61,6 @@ Expr *parseExpr(Token **ptrptr, Token *token_end);
 Expr *parseUnary(Token **ptrptr, Token *token_end);
 Expr *parseProgram(Token **ptrptr, Token *token_end);
 int tokenize(char *str);
+void EvaluateExprIntoRax(Expr *expr);
 
 extern Token tokens[1000];
