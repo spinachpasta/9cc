@@ -76,4 +76,8 @@ assert check("1>=1", 1)
 assert check("1<=0", 0)
 assert check("1<=1", 1)
 
+
+#semicolon
+assert check("1+1;5-2",3);
+
 print("OK")

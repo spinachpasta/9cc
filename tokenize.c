@@ -19,6 +19,15 @@ int tokenize(char *str)
       i++;
       break;
     }
+    case ';':
+    {
+      /* code */
+      Token token = {TK_Semicolon, 0};
+      tokens[token_index] = token;
+      token_index++;
+      i++;
+      break;
+    }
     case '(':
     {
       /* code */

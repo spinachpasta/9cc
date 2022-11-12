@@ -8,7 +8,8 @@ enum BinaryOperation{
   BO_Equal,
   BO_Greater,
   BO_GreaterEqual,
-  BO_NotEqual
+  BO_NotEqual,
+  BO_AndThen
 };
 
 enum ExprKind
@@ -41,6 +42,7 @@ enum TokenKind
   TK_GreaterEqual,
   TK_Less,
   TK_LessEqual,
+  TK_Semicolon,
 };
 
 typedef struct Token
@@ -57,5 +59,7 @@ Expr *parseMultiplicative(Token **ptrptr, Token *token_end);
 Expr *parseAdditive(Token **ptrptr, Token *token_end);
 Expr *parseExpr(Token **ptrptr, Token *token_end);
 Expr *parseUnary(Token **ptrptr, Token *token_end);
+Expr *parseProgram(Token **ptrptr, Token *token_end);
+int tokenize(char *str);
 
 extern Token tokens[1000];

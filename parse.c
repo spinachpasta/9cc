@@ -173,6 +173,41 @@ Expr *parseExpr(Token **ptrptr, Token *token_end)
   return parseEquality(ptrptr, token_end);
 }
 
+// program = expr (";" expr)*
+Expr *parseProgram(Token **ptrptr, Token *token_end)
+{
+  Token *tokens = *ptrptr;
+  if (token_end == tokens)
+  {
+    fprintf(stderr, "No token found");
+    exit(1);
+  }
+  Expr *result = parseExpr(&tokens, token_end);
+
+  for (; tokens < token_end;)
+  {
+    Token maybe_operator = *tokens;
+    switch (maybe_operator.kind)
+    {
+    case TK_Semicolon:
+    {
+      tokens++;
+      Expr *numberexp = parseExpr(&tokens, token_end);
+      result = binaryExpr(result, numberexp, BO_AndThen);
+      // ptr++;
+      break;
+    }
+    default:
+      *ptrptr = tokens;
+      return result;
+      break;
+    }
+  }
+  *ptrptr = tokens;
+  return result;
+}
+
+
 // mul = unary ("*" unary | "/" unary)*
 Expr *parseMultiplicative(Token **ptrptr, Token *token_end)
 {

@@ -27,7 +27,7 @@ int main(int argc, char **argv)
   printf("main:\n");
   Token *ptr = tokens;
   Token *token_end = tokens + token_length;
-  Expr *expr = parseExpr(&ptr, token_end);
+  Expr *expr = parseProgram(&ptr, token_end);
   EvaluateExprIntoRax(expr);
   printf("  ret\n");
   return 0;
