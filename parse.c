@@ -10,6 +10,14 @@ Expr *numberexpr(int value)
   return numberexp;
 }
 
+Expr *identifierexpr(char value)
+{
+  Expr *numberexp = calloc(1, sizeof(Expr));
+  numberexp->value = value;
+  numberexp->expr_kind = EK_Identifier;
+  return numberexp;
+}
+
 Expr *binaryExpr(Expr *first_child, Expr *second_child, enum BinaryOperation binaryop)
 {
   Expr *newexp = calloc(1, sizeof(Expr));
@@ -114,7 +122,7 @@ Expr *parseEquality(Token **ptrptr, Token *token_end)
   *ptrptr = tokens;
   return result;
 }
-
+// primary    = num | ident | "(" expr ")"
 Expr *parsePrimary(Token **ptrptr, Token *token_end)
 {
   Token *maybe_number = *ptrptr;
@@ -123,7 +131,17 @@ Expr *parsePrimary(Token **ptrptr, Token *token_end)
     fprintf(stderr, "Expected: number, but got EOF");
     exit(1);
   }
-  if (maybe_number->kind != TK_Number)
+  if (maybe_number->kind == TK_Number)
+  {
+    *ptrptr += 1;
+    return numberexpr(maybe_number->value);
+  }
+  else if (maybe_number->kind == TK_Identifier)
+  {
+    *ptrptr += 1;
+    return identifierexpr(maybe_number->value);
+  }
+  else
   {
     Token *maybe_leftparenthesis = maybe_number;
     if (maybe_leftparenthesis->kind == TK_LeftParenthesis)
@@ -142,8 +160,6 @@ Expr *parsePrimary(Token **ptrptr, Token *token_end)
     fprintf(stderr, "Expected: number. Token Kind:%d", maybe_number->kind);
     exit(1);
   }
-  *ptrptr += 1;
-  return numberexpr(maybe_number->value);
 }
 // unary   = ("+" | "-")? primary
 Expr *parseUnary(Token **ptrptr, Token *token_end)
@@ -170,9 +186,27 @@ Expr *parseUnary(Token **ptrptr, Token *token_end)
 // expr       = equality
 Expr *parseExpr(Token **ptrptr, Token *token_end)
 {
-  return parseEquality(ptrptr, token_end);
+  return parseAssign(ptrptr, token_end);
 }
-
+Expr *parseAssign(Token **ptrptr, Token *token_end)
+{
+  Token *tokens = *ptrptr;
+  if (token_end == tokens)
+  {
+    fprintf(stderr, "No token found");
+    exit(1);
+  }
+  Expr *result = parseEquality(&tokens, token_end);
+  if (tokens->kind == TK_Assign)
+  {
+    tokens++;
+    Expr *newresult = parseAssign(&tokens, token_end);
+    *ptrptr = tokens;
+    return binaryExpr(result, newresult, BO_Assign);
+  }
+  *ptrptr = tokens;
+  return result;
+}
 // program = expr (";" expr)*
 Expr *parseProgram(Token **ptrptr, Token *token_end)
 {
@@ -206,7 +240,6 @@ Expr *parseProgram(Token **ptrptr, Token *token_end)
   *ptrptr = tokens;
   return result;
 }
-
 
 // mul = unary ("*" unary | "/" unary)*
 Expr *parseMultiplicative(Token **ptrptr, Token *token_end)

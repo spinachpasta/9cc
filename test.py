@@ -80,4 +80,8 @@ assert check("1<=1", 1)
 #semicolon
 assert check("1+1;5-2",3);
 
+#variables
+assert check("a=3;a",3);
+assert check("a=3;b=4;a+b",7);
+
 print("OK")

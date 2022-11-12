@@ -9,13 +9,15 @@ enum BinaryOperation{
   BO_Greater,
   BO_GreaterEqual,
   BO_NotEqual,
-  BO_AndThen
+  BO_AndThen,
+  BO_Assign
 };
 
 enum ExprKind
 {
   EK_Number,
-  EK_Operator
+  EK_Operator,
+  EK_Identifier,
 };
 
 typedef struct Expr
@@ -43,6 +45,8 @@ enum TokenKind
   TK_Less,
   TK_LessEqual,
   TK_Semicolon,
+  TK_Assign,
+  TK_Identifier,
 };
 
 typedef struct Token
@@ -60,6 +64,8 @@ Expr *parseAdditive(Token **ptrptr, Token *token_end);
 Expr *parseExpr(Token **ptrptr, Token *token_end);
 Expr *parseUnary(Token **ptrptr, Token *token_end);
 Expr *parseProgram(Token **ptrptr, Token *token_end);
+Expr *parseAssign(Token **ptrptr, Token *token_end);
+
 int tokenize(char *str);
 void EvaluateExprIntoRax(Expr *expr);
 
