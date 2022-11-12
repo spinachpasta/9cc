@@ -60,4 +60,14 @@ assert check("1==1", 1)
 assert check("1==1+5", 0)
 assert check("1+(1+1==1+1)",2)
 
+#relational
+assert check("1>0", 1)
+assert check("1>1", 0)
+assert check("1<0", 0)
+assert check("1<1", 0)
+assert check("1>=0", 1)
+assert check("1>=1", 1)
+assert check("1<=0", 0)
+assert check("1<=1", 1)
+
 print("OK")

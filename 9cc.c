@@ -8,6 +8,8 @@ enum BinaryOperation
   BO_Mul,
   BO_Div,
   BO_Equal,
+  BO_Greater,
+  BO_GreaterEqual
 };
 
 enum ExprKind
@@ -35,6 +37,10 @@ enum TokenKind
   TK_LeftParenthesis,
   TK_RightParenthesis,
   TK_Equal,
+  TK_Greater,
+  TK_GreaterEqual,
+  TK_Less,
+  TK_LessEqual,
 };
 
 typedef struct Token
@@ -100,6 +106,20 @@ void EvaluateExprIntoRax(Expr *expr)
       printf("  movzb rax, al\n");
       break;
     }
+    case BO_Greater:
+    {
+      printf("  cmp rax, rdi\n");
+      printf("  setg al\n");
+      printf("  movzb rax, al\n");
+      break;
+    }
+    case BO_GreaterEqual:
+    {
+      printf("  cmp rax, rdi\n");
+      printf("  setge al\n");
+      printf("  movzb rax, al\n");
+      break;
+    }
     default:
     {
       fprintf(stderr, "Invalid binaryop kind:%d", expr->binary_op);
@@ -137,7 +157,57 @@ Expr *binaryExpr(Expr *first_child, Expr *second_child, enum BinaryOperation bin
 // relational = add ("<" add | "<=" add | ">" add | ">=" add)*
 Expr *parseRelational(Token **ptrptr, Token *token_end)
 {
-  return parseAdditive(ptrptr, token_end);
+  Token *tokens = *ptrptr;
+  if (token_end == tokens)
+  {
+    fprintf(stderr, "No token found");
+    exit(1);
+  }
+  Expr *result = parseAdditive(&tokens, token_end);
+
+  for (; tokens < token_end;)
+  {
+    Token maybe_relational = *tokens;
+    switch (maybe_relational.kind)
+    {
+    case TK_Greater:
+    {
+      tokens++;
+      Expr *numberexp = parseAdditive(&tokens, token_end);
+      result = binaryExpr(result, numberexp, BO_Greater);
+      break;
+    }
+    case TK_GreaterEqual:
+    {
+      tokens++;
+      Expr *numberexp = parseAdditive(&tokens, token_end);
+      result = binaryExpr(result, numberexp, BO_GreaterEqual);
+      break;
+    }
+    case TK_Less:
+    {
+      tokens++;
+      Expr *numberexp = parseAdditive(&tokens, token_end);
+      //swap children of operator node
+      result = binaryExpr(numberexp,result, BO_Greater);
+      break;
+    }
+    case TK_LessEqual:
+    {
+      tokens++;
+      Expr *numberexp = parseAdditive(&tokens, token_end);
+      //swap children of operator node
+      result = binaryExpr(numberexp,result, BO_GreaterEqual);
+      break;
+    }
+    default:
+      *ptrptr = tokens;
+      return result;
+      break;
+    }
+  }
+  *ptrptr = tokens;
+  return result;
 }
 // equality   = relational ("==" relational | "!=" relational)*
 Expr *parseEquality(Token **ptrptr, Token *token_end)
@@ -384,6 +454,41 @@ int tokenize(char *str)
       i++;
       break;
     }
+    case '>':
+    {
+      i++;
+      char c = str[i];
+      if (c != '=')
+      {
+        Token token = {TK_Greater, 0};
+        tokens[token_index] = token;
+        token_index++;
+        break;
+      }
+      i++;
+      Token token = {TK_GreaterEqual, 0};
+      tokens[token_index] = token;
+      token_index++;
+      break;
+    }
+    case '<':
+    {
+      i++;
+      char c = str[i];
+      if (c != '=')
+      {
+        Token token = {TK_Less, 0};
+        tokens[token_index] = token;
+        token_index++;
+        break;
+      }
+      i++;
+      Token token = {TK_LessEqual, 0};
+      tokens[token_index] = token;
+      token_index++;
+      break;
+    }
+
     //==
     case '=':
     {
