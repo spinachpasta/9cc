@@ -57,3 +57,5 @@ Expr *parseMultiplicative(Token **ptrptr, Token *token_end);
 Expr *parseAdditive(Token **ptrptr, Token *token_end);
 Expr *parseExpr(Token **ptrptr, Token *token_end);
 Expr *parseUnary(Token **ptrptr, Token *token_end);
+
+extern Token tokens[1000];
