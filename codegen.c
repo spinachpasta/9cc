@@ -15,19 +15,30 @@ void EvaluateLValueAddressIntoRax(Expr *expr)
         exit(1);
     }
 }
-void Codegen(Stmt* stmt){
+void Codegen(Stmt *stmt)
+{
     switch (stmt->stmt_kind)
     {
-    case SK_Expr:{
+    case SK_Expr:
+    {
         EvaluateExprIntoRax(stmt->expr);
         break;
     }
-    case SK_AndThen:{
+    case SK_AndThen:
+    {
         Codegen(stmt->first_child);
         Codegen(stmt->second_child);
         break;
     }
-    
+    case SK_Return:
+    {
+        EvaluateExprIntoRax(stmt->expr);
+        // epilogue
+        printf("  mov rsp, rbp\n");
+        printf("  pop rbp\n");
+        printf("  ret\n");
+        break;
+    }
     default:
         break;
     }

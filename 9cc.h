@@ -32,7 +32,8 @@ typedef struct Expr
 
 enum StmtKind{
   SK_AndThen,
-  SK_Expr
+  SK_Expr,
+  SK_Return,
 };
 
 typedef struct Stmt
@@ -77,6 +78,7 @@ enum TokenKind
   TK_Semicolon,
   TK_Assign,
   TK_Identifier,
+  TK_Return,
 };
 
 typedef struct Token
@@ -102,6 +104,7 @@ int tokenize(char *str);
 LVar *findLVar(char *name);
 LVar *insertLVar(char *name);
 LVar *lastLVar();
+int is_alnum(char c);
 
 
 void EvaluateExprIntoRax(Expr *expr);

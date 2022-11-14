@@ -208,13 +208,19 @@ Expr *parseAssign(Token **ptrptr, Token *token_end)
   return result;
 }
 // statement= expr ";"
-Stmt *parseStatement(Token **ptrptr, Token *token_end)
+Stmt *parseStmt(Token **ptrptr, Token *token_end)
 {
   Token *tokens = *ptrptr;
   if (token_end == tokens)
   {
     fprintf(stderr, "No token found");
     exit(1);
+  }
+  int is_return = 0;
+  if (tokens->kind == TK_Return)
+  {
+    tokens++;
+    is_return = 1;
   }
   Expr *expr = parseExpr(&tokens, token_end);
   {
@@ -230,7 +236,7 @@ Stmt *parseStatement(Token **ptrptr, Token *token_end)
     }
   }
   Stmt *stmt = malloc(sizeof(Stmt));
-  stmt->stmt_kind = SK_Expr;
+  stmt->stmt_kind = is_return ? SK_Return : SK_Expr;
   stmt->first_child = NULL;
   stmt->second_child = NULL;
   stmt->expr = expr;
@@ -246,11 +252,11 @@ Stmt *parseProgram(Token **ptrptr, Token *token_end)
     fprintf(stderr, "No token found");
     exit(1);
   }
-  Stmt *result = parseStatement(&tokens, token_end);
+  Stmt *result = parseStmt(&tokens, token_end);
 
   for (; tokens < token_end;)
   {
-    Stmt *statement = parseStatement(&tokens, token_end);
+    Stmt *statement = parseStmt(&tokens, token_end);
     Stmt *newexp = calloc(1, sizeof(Stmt));
     newexp->first_child = result;
     newexp->stmt_kind = SK_AndThen;

@@ -24,67 +24,70 @@ def check(input: str, expected: int):
     return False
 
 
-assert check("0;", 0)
+assert check("return 0;", 0)
 
-assert check("42;", 42)
+assert check("return 42;", 42)
 
-assert check("0+10+3;", 0+10+3)
+assert check("return 0+10+3;", 0+10+3)
 
-assert check("111+10-42;", 111+10-42)
+assert check("return 111+10-42;", 111+10-42)
 
-assert check("   111   + 10 -     42;", 111+10-42)
+assert check("return    111   + 10 -     42;", 111+10-42)
 
-assert check("   0 +    10+    3;",  0 +    10+    3)
+assert check("return    0 +    10+    3;",  0 +    10+    3)
 
-assert check("10*2;", 10*2)
+assert check("return 10*2;", 10*2)
 
-assert check("10+1*2;", 10+1*2)
-assert check("10+3*2+10-5;", 10+3*2+10-5)
+assert check("return 10+1*2;", 10+1*2)
+assert check("return 10+3*2+10-5;", 10+3*2+10-5)
 
-assert check("(10+3)*2+10-5;", (10+3)*2+10-5)
-assert check("(10+1)*2;", (10+1)*2)
+assert check("return (10+3)*2+10-5;", (10+3)*2+10-5)
+assert check("return (10+1)*2;", (10+1)*2)
 
 
-assert check("(10+1)/2;", (10+1)//2)
-assert check("(15+1)/2+3;", (15+1)//2+3)
-assert check("10+1 /2/5;", 10+1//2//5)
+assert check("return (10+1)/2;", (10+1)//2)
+assert check("return (15+1)/2+3;", (15+1)//2+3)
+assert check("return 10+1 /2/5;", 10+1//2//5)
 
 #unary
-assert check("-10+1 /2/5+30;", -10+1//2//5+30)
-assert check("+10+1 /2/5;", +10+1//2//5)
-assert check("-2*-3;", -2*-3)
+assert check("return -10+1 /2/5+30;", -10+1//2//5+30)
+assert check("return +10+1 /2/5;", +10+1//2//5)
+assert check("return -2*-3;", -2*-3)
 
 #equality
-assert check("1==0;", 0)
-assert check("1==1;", 1)
-assert check("1==1+5;", 0)
-assert check("1+(1+1==1+1);",2)
+assert check("return 1==0;", 0)
+assert check("return 1==1;", 1)
+assert check("return 1==1+5;", 0)
+assert check("return 1+(1+1==1+1);",2)
 
-assert check("1!=0;", 1)
-assert check("1!=1;", 0)
-assert check("1!=1+5;", 1)
-assert check("1+(1+1!=1+1);",1)
+assert check("return 1!=0;", 1)
+assert check("return 1!=1;", 0)
+assert check("return 1!=1+5;", 1)
+assert check("return 1+(1+1!=1+1);",1)
 
 
 #relational
-assert check("1>0;", 1)
-assert check("1>1;", 0)
-assert check("1<0;", 0)
-assert check("1<1;", 0)
-assert check("1>=0;", 1)
-assert check("1>=1;", 1)
-assert check("1<=0;", 0)
-assert check("1<=1;", 1)
+assert check("return 1>0;", 1)
+assert check("return 1>1;", 0)
+assert check("return 1<0;", 0)
+assert check("return 1<1;", 0)
+assert check("return 1>=0;", 1)
+assert check("return 1>=1;", 1)
+assert check("return 1<=0;", 0)
+assert check("return 1<=1;", 1)
 
 
 #semicolon
-assert check("1+1;5-2;",3);
+assert check("1+1;return 5-2;",3);
 
 #variables
-assert check("a=3;a;",3);
-assert check("a=3;b=4;a+b;",7);
+assert check("a=3;return a;",3);
+assert check("a=3;b=4;return a+b;",7);
 
-assert check("ab=3;bd=4;ab+bd;",7);
-assert check("abz=3;bdz =4;abz+bdz;",7);
+assert check("ab=3;bd=4;return ab+bd;",7);
+assert check("abz=3;bdz =4;return abz+bdz;",7);
+
+assert check("return 1;return 2;",1);
+assert check("return 1;return 2+3;",1);
 
 print("OK")

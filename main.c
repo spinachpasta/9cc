@@ -34,9 +34,5 @@ int main(int argc, char **argv)
     printf("  mov rbp, rsp\n");
     printf("  sub rsp, 208\n");
     Codegen(expr);
-    //epilogue
-    printf("  mov rsp, rbp\n");
-    printf("  pop rbp\n");
-    printf("  ret\n");
     return 0;
 }
