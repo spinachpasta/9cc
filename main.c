@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 
     Token *ptr = tokens;
     Token *token_end = tokens + token_length;
-    Expr *expr = parseProgram(&ptr, token_end);
+    Stmt *expr = parseProgram(&ptr, token_end);
 
     printf(".intel_syntax noprefix\n");
     printf(".globl main\n");
@@ -33,7 +33,7 @@ int main(int argc, char **argv)
     printf("  push rbp\n");
     printf("  mov rbp, rsp\n");
     printf("  sub rsp, 208\n");
-    EvaluateExprIntoRax(expr);
+    Codegen(expr);
     //epilogue
     printf("  mov rsp, rbp\n");
     printf("  pop rbp\n");

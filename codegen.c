@@ -15,6 +15,23 @@ void EvaluateLValueAddressIntoRax(Expr *expr)
         exit(1);
     }
 }
+void Codegen(Stmt* stmt){
+    switch (stmt->stmt_kind)
+    {
+    case SK_Expr:{
+        EvaluateExprIntoRax(stmt->expr);
+        break;
+    }
+    case SK_AndThen:{
+        Codegen(stmt->first_child);
+        Codegen(stmt->second_child);
+        break;
+    }
+    
+    default:
+        break;
+    }
+}
 void EvaluateExprIntoRax(Expr *expr)
 {
     switch (expr->expr_kind)

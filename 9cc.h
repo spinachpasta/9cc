@@ -30,6 +30,21 @@ typedef struct Expr
   char* name;
 } Expr;
 
+enum StmtKind{
+  SK_AndThen,
+  SK_Expr
+};
+
+typedef struct Stmt
+{
+  enum StmtKind stmt_kind;
+  
+  struct Expr *expr;
+
+  struct Stmt *first_child;
+  struct Stmt *second_child;
+} Stmt;
+
 typedef struct LVar LVar;
 
 // ローカル変数の型
@@ -79,8 +94,9 @@ Expr *parseMultiplicative(Token **ptrptr, Token *token_end);
 Expr *parseAdditive(Token **ptrptr, Token *token_end);
 Expr *parseExpr(Token **ptrptr, Token *token_end);
 Expr *parseUnary(Token **ptrptr, Token *token_end);
-Expr *parseProgram(Token **ptrptr, Token *token_end);
+Stmt *parseProgram(Token **ptrptr, Token *token_end);
 Expr *parseAssign(Token **ptrptr, Token *token_end);
+void Codegen(Stmt* stmt);
 
 int tokenize(char *str);
 LVar *findLVar(char *name);
