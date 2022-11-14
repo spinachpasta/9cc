@@ -5,8 +5,9 @@ void EvaluateLValueAddressIntoRax(Expr *expr)
 {
     if (expr->expr_kind == EK_Identifier)
     {
+        LVar *local = findLVar(expr->name);
         printf("  mov rax, rbp\n");
-        printf("  sub rax, %d\n", (expr->value - 'a') * 8);
+        printf("  sub rax, %d\n", local->offset);
     }
     else
     {

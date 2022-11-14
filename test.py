@@ -84,4 +84,7 @@ assert check("1+1;5-2",3);
 assert check("a=3;a",3);
 assert check("a=3;b=4;a+b",7);
 
+assert check("ab=3;bd=4;ab+bd",7);
+assert check("abz=3;bdz =4;abz+bdz",7);
+
 print("OK")

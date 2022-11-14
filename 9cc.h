@@ -27,7 +27,22 @@ typedef struct Expr
   int value;
   struct Expr *first_child;
   struct Expr *second_child;
+  char* name;
 } Expr;
+
+typedef struct LVar LVar;
+
+// ローカル変数の型
+struct LVar {
+  LVar *next; // 次の変数かNULL
+  char* name; // 変数の名前
+  int len;    // 名前の長さ
+  int offset; // RBPからのオフセット
+};
+
+extern LVar *locals;
+
+
 
 enum TokenKind
 {
@@ -53,6 +68,7 @@ typedef struct Token
 {
   enum TokenKind kind;
   int value;
+  char* name;
 } Token;
 
 // prototype declaration
@@ -67,6 +83,11 @@ Expr *parseProgram(Token **ptrptr, Token *token_end);
 Expr *parseAssign(Token **ptrptr, Token *token_end);
 
 int tokenize(char *str);
+LVar *findLVar(char *name);
+LVar *insertLVar(char *name);
+LVar *lastLVar();
+
+
 void EvaluateExprIntoRax(Expr *expr);
 
 extern Token tokens[1000];

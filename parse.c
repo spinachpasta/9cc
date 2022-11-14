@@ -10,10 +10,10 @@ Expr *numberexpr(int value)
   return numberexp;
 }
 
-Expr *identifierexpr(char value)
+Expr *identifierexpr(char* name)
 {
   Expr *numberexp = calloc(1, sizeof(Expr));
-  numberexp->value = value;
+  numberexp->name = name;
   numberexp->expr_kind = EK_Identifier;
   return numberexp;
 }
@@ -139,7 +139,7 @@ Expr *parsePrimary(Token **ptrptr, Token *token_end)
   else if (maybe_number->kind == TK_Identifier)
   {
     *ptrptr += 1;
-    return identifierexpr(maybe_number->value);
+    return identifierexpr(maybe_number->name);
   }
   else
   {

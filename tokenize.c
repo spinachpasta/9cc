@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "9cc.h"
+
+LVar *locals;
 
 int tokenize(char *str)
 {
@@ -167,10 +170,35 @@ int tokenize(char *str)
         case 'b':
         case 'c':
         {
+            char *start = str + i;
             i++;
-            Token token = {TK_Identifier, c};
+            for (;;)
+            {
+                char c1 = str[i];
+                if ('a' <= c1 && c1 <= 'z')
+                {
+                    i++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            char *end = str + i;
+
+            int length = end - start;
+            char *name = malloc(length + 1);
+            memcpy(name, start, length);
+            name[length] = '\0';
+            if (!findLVar(name))
+            {
+                insertLVar(name);
+            }
+            Token token = {TK_Identifier, 0};
+            token.name = name;
             tokens[token_index] = token;
             token_index++;
+
             break;
         }
         default:
@@ -218,4 +246,67 @@ int intLength(char *str)
 int isDigit(char c)
 {
     return '0' <= c && c <= '9';
+}
+
+LVar *findLVar(char *name)
+{
+    LVar *local = locals;
+    if (!local)
+    {
+        return NULL;
+    }
+    while (local)
+    {
+        if (!strcmp(name, local->name))
+        {
+            return local;
+        }
+        local = local->next;
+    }
+    return NULL;
+}
+
+LVar *insertLVar(char *name)
+{
+    LVar *newlocal = malloc(sizeof(LVar));
+    LVar *last = lastLVar();
+    bzero(newlocal, sizeof(LVar));
+    newlocal->len = strlen(name);
+    newlocal->name = name;
+    if (!last)
+    {
+        newlocal->offset = 0;
+    }
+    else
+    {
+        newlocal->offset = last->offset + 8; // offset+last size
+    }
+    newlocal->next = NULL;
+
+    if (!last)
+    {
+        locals = newlocal;
+    }
+    else
+    {
+        last->next = newlocal;
+    }
+    return newlocal;
+}
+
+LVar *lastLVar()
+{
+    LVar *local = locals;
+    if (!local)
+    {
+        return NULL;
+    }
+    while (1)
+    {
+        if (!local->next)
+        {
+            return local;
+        }
+        local = local->next;
+    }
 }
