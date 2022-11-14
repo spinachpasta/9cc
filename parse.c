@@ -207,8 +207,8 @@ Expr *parseAssign(Token **ptrptr, Token *token_end)
   *ptrptr = tokens;
   return result;
 }
-// program = (expr ";")*
-Expr *parseProgram(Token **ptrptr, Token *token_end)
+// statement= expr ";"
+Expr *parseStatement(Token **ptrptr, Token *token_end)
 {
   Token *tokens = *ptrptr;
   if (token_end == tokens)
@@ -229,25 +229,24 @@ Expr *parseProgram(Token **ptrptr, Token *token_end)
       exit(1);
     }
   }
+  *ptrptr = tokens;
+  return result;
+}
+// program = (expr ";")*
+Expr *parseProgram(Token **ptrptr, Token *token_end)
+{
+  Token *tokens = *ptrptr;
+  if (token_end == tokens)
+  {
+    fprintf(stderr, "No token found");
+    exit(1);
+  }
+  Expr *result = parseStatement(&tokens, token_end);
 
   for (; tokens < token_end;)
   {
-    {
-      Expr *numberexp = parseExpr(&tokens, token_end);
-      result = binaryExpr(result, numberexp, BO_AndThen);
-    }
-    {
-      Token maybe_operator = *tokens;
-      if (maybe_operator.kind == TK_Semicolon)
-      {
-        tokens++;
-      }
-      else
-      {
-        fprintf(stderr, "no semicolon after expr");
-        exit(1);
-      }
-    }
+    Expr *statement = parseStatement(&tokens, token_end);
+    result = binaryExpr(result, statement, BO_AndThen);
   }
   *ptrptr = tokens;
   return result;
