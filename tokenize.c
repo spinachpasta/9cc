@@ -268,9 +268,8 @@ LVar *findLVar(char *name)
 
 LVar *insertLVar(char *name)
 {
-    LVar *newlocal = malloc(sizeof(LVar));
+    LVar *newlocal = calloc(1,sizeof(LVar));
     LVar *last = lastLVar();
-    bzero(newlocal, sizeof(LVar));
     newlocal->len = strlen(name);
     newlocal->name = name;
     if (!last)

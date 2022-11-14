@@ -10,7 +10,7 @@ Expr *numberexpr(int value)
   return numberexp;
 }
 
-Expr *identifierexpr(char* name)
+Expr *identifierexpr(char *name)
 {
   Expr *numberexp = calloc(1, sizeof(Expr));
   numberexp->name = name;
@@ -207,7 +207,7 @@ Expr *parseAssign(Token **ptrptr, Token *token_end)
   *ptrptr = tokens;
   return result;
 }
-// program = expr (";" expr)*
+// program = (expr ";")*
 Expr *parseProgram(Token **ptrptr, Token *token_end)
 {
   Token *tokens = *ptrptr;
@@ -217,24 +217,36 @@ Expr *parseProgram(Token **ptrptr, Token *token_end)
     exit(1);
   }
   Expr *result = parseExpr(&tokens, token_end);
+  {
+    Token maybe_operator = *tokens;
+    if (maybe_operator.kind == TK_Semicolon)
+    {
+      tokens++;
+    }
+    else
+    {
+      fprintf(stderr, "no semicolon after expr");
+      exit(1);
+    }
+  }
 
   for (; tokens < token_end;)
   {
-    Token maybe_operator = *tokens;
-    switch (maybe_operator.kind)
     {
-    case TK_Semicolon:
-    {
-      tokens++;
       Expr *numberexp = parseExpr(&tokens, token_end);
       result = binaryExpr(result, numberexp, BO_AndThen);
-      // ptr++;
-      break;
     }
-    default:
-      *ptrptr = tokens;
-      return result;
-      break;
+    {
+      Token maybe_operator = *tokens;
+      if (maybe_operator.kind == TK_Semicolon)
+      {
+        tokens++;
+      }
+      else
+      {
+        fprintf(stderr, "no semicolon after expr");
+        exit(1);
+      }
     }
   }
   *ptrptr = tokens;
