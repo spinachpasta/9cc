@@ -20,6 +20,14 @@ int tokenize(char *str)
             i += 6;
             continue;
         }
+        if (strncmp(ptr, "if", 2) == 0 && !is_alnum(ptr[2]))
+        {
+            Token token = {TK_IF, 0};
+            tokens[token_index] = token;
+            token_index++;
+            i += 2;
+            continue;
+        }
         switch (c)
         {
         case '+':
@@ -173,27 +181,6 @@ int tokenize(char *str)
         case ' ':
         {
             i++;
-            break;
-        }
-        case 'i':
-        {
-            int consumed = 0;
-            consumed++;
-            i++;
-            char c = str[i];
-            if (str[i] == 'f')
-            {
-                i++;
-                consumed++;
-                Token token = {TK_IF, 0};
-                tokens[token_index] = token;
-                token_index++;
-            }
-            else
-            {
-                fprintf(stderr, "%s: unknown token i%c(%d)\n", __FUNCTION__, c, c);
-                return -1;
-            }
             break;
         }
         case 'a':
