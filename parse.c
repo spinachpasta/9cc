@@ -208,6 +208,7 @@ Expr *parseAssign(Token **ptrptr, Token *token_end)
   return result;
 }
 // statement= expr ";"
+//        | "if" "(" expr ")" stmt ("else" stmt)?
 Stmt *parseStmt(Token **ptrptr, Token *token_end)
 {
   Token *tokens = *ptrptr;
@@ -217,29 +218,69 @@ Stmt *parseStmt(Token **ptrptr, Token *token_end)
     exit(1);
   }
   int is_return = 0;
+  int is_if = 0;
   if (tokens->kind == TK_Return)
   {
     tokens++;
     is_return = 1;
   }
-  Expr *expr = parseExpr(&tokens, token_end);
+  if (tokens->kind == TK_IF)
   {
-    Token maybe_operator = *tokens;
-    if (maybe_operator.kind == TK_Semicolon)
+    tokens++;
+    is_if = 1;
+    if (tokens->kind == TK_LeftParenthesis)
     {
       tokens++;
     }
     else
     {
-      fprintf(stderr, "no semicolon after expr");
+      fprintf(stderr, "expected right parenthesis got %d\n", tokens->kind);
       exit(1);
     }
   }
+  Expr *expr = parseExpr(&tokens, token_end);
+  {
+    Token maybe_operator = *tokens;
+    if (is_if)
+    {
+      if (maybe_operator.kind == TK_RightParenthesis)
+      {
+        tokens++;
+      }
+      else
+      {
+        fprintf(stderr, "expected right parenthesis got %d\n", maybe_operator.kind);
+        exit(1);
+      }
+    }
+    else
+    {
+      if (maybe_operator.kind == TK_Semicolon)
+      {
+        tokens++;
+      }
+      else
+      {
+        fprintf(stderr, "no semicolon after expr. kind=%d\n", maybe_operator.kind);
+        exit(1);
+      }
+    }
+  }
   Stmt *stmt = malloc(sizeof(Stmt));
-  stmt->stmt_kind = is_return ? SK_Return : SK_Expr;
+  stmt->stmt_kind = SK_Expr;
   stmt->first_child = NULL;
   stmt->second_child = NULL;
   stmt->expr = expr;
+  if (is_if)
+  {
+    stmt->stmt_kind = SK_IF;
+    Stmt *statement = parseStmt(&tokens, token_end);
+    stmt->second_child = statement;
+  }
+  if (is_return)
+  {
+    stmt->stmt_kind = SK_Return;
+  }
   *ptrptr = tokens;
   return stmt;
 }

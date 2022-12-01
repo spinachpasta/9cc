@@ -89,5 +89,7 @@ assert check("abz=3;bdz =4;return abz+bdz;",7);
 
 assert check("return 1;return 2;",1);
 assert check("return 1;return 2+3;",1);
+assert check("a=1;if(a)return 5;return 10;",5);
+assert check("a=0;if(a)return 5;return 10;",10);
 
 print("OK")

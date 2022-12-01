@@ -39,6 +39,15 @@ void Codegen(Stmt *stmt)
         printf("  ret\n");
         break;
     }
+    case SK_IF:{
+        EvaluateExprIntoRax(stmt->expr);
+        printf("  pop rax\n");
+        printf("  cmp rax, 0\n");
+        printf("  je  .LendXXX\n");
+        EvaluateExprIntoRax(stmt->second_child->expr);
+        printf(".LendXXX:\n");
+        break;
+    }
     default:
         break;
     }

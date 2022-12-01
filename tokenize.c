@@ -175,6 +175,27 @@ int tokenize(char *str)
             i++;
             break;
         }
+        case 'i':
+        {
+            int consumed = 0;
+            consumed++;
+            i++;
+            char c = str[i];
+            if (str[i] == 'f')
+            {
+                i++;
+                consumed++;
+                Token token = {TK_IF, 0};
+                tokens[token_index] = token;
+                token_index++;
+            }
+            else
+            {
+                fprintf(stderr, "%s: unknown token i%c(%d)\n", __FUNCTION__, c, c);
+                return -1;
+            }
+            break;
+        }
         case 'a':
         case 'b':
         case 'c':
@@ -219,13 +240,13 @@ int tokenize(char *str)
     }
     return token_index;
 }
-int is_alnum(char c) {
-  return ('a' <= c && c <= 'z') ||
-         ('A' <= c && c <= 'Z') ||
-         ('0' <= c && c <= '9') ||
-         (c == '_');
+int is_alnum(char c)
+{
+    return ('a' <= c && c <= 'z') ||
+           ('A' <= c && c <= 'Z') ||
+           ('0' <= c && c <= '9') ||
+           (c == '_');
 }
-
 
 int parseInt(char *str)
 {

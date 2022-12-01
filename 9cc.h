@@ -34,6 +34,7 @@ enum StmtKind{
   SK_AndThen,
   SK_Expr,
   SK_Return,
+  SK_IF,
 };
 
 typedef struct Stmt
@@ -79,6 +80,7 @@ enum TokenKind
   TK_Assign,
   TK_Identifier,
   TK_Return,
+  TK_IF,
 };
 
 typedef struct Token
