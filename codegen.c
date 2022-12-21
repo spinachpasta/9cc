@@ -54,11 +54,15 @@ void Codegen(Stmt *stmt)
     }
     case SK_WHILE:
     {
-        printf(".Lend%d:\n",labelCounter);
+        printf(".Lbegin%d:\n",labelCounter);
         EvaluateExprIntoRax(stmt->expr);
         printf("  cmp rax, 0\n");
         printf("  je  .Lend%d\n",labelCounter);
         Codegen(stmt->second_child);
+        printf("  jmp  .Lbegin%d\n",labelCounter);
+        printf(".Lend%d:\n",labelCounter);
+        
+        labelCounter++;
         break;
     }
     default:

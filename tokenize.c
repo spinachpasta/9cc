@@ -28,7 +28,7 @@ int tokenize(char *str)
             i += 2;
             continue;
         }
-        if (strncmp(ptr, "while", 5) == 0 && !is_alnum(ptr[2]))
+        if (strncmp(ptr, "while", 5) == 0 && !is_alnum(ptr[5]))
         {
             Token token = {TK_WHILE, 0};
             tokens[token_index] = token;

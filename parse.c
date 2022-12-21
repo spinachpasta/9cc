@@ -256,7 +256,7 @@ Stmt *parseStmt(Token **ptrptr, Token *token_end)
   Expr *expr = parseExpr(&tokens, token_end);
   {
     Token maybe_operator = *tokens;
-    if (is_if)
+    if (is_if || is_while)
     {
       if (maybe_operator.kind == TK_RightParenthesis)
       {

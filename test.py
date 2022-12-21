@@ -99,5 +99,7 @@ assert check("a=1;if(a)return 5;return 10;",5);
 assert check("a=0;if(a)return 5;return 10;",10);
 
 assert check("a=0;if(a)return 5;a=1;if(a)return 3;return 10;",3);
+assert check("a=0;while(a)return 1; return 3;",3);
+assert check("a=0;while(a<5)a=a+1; return a;",5);
 
 print("OK")
