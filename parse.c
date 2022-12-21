@@ -219,6 +219,7 @@ Stmt *parseStmt(Token **ptrptr, Token *token_end)
   }
   int is_return = 0;
   int is_if = 0;
+  int is_while = 0;
   if (tokens->kind == TK_Return)
   {
     tokens++;
@@ -228,6 +229,20 @@ Stmt *parseStmt(Token **ptrptr, Token *token_end)
   {
     tokens++;
     is_if = 1;
+    if (tokens->kind == TK_LeftParenthesis)
+    {
+      tokens++;
+    }
+    else
+    {
+      fprintf(stderr, "expected right parenthesis got %d\n", tokens->kind);
+      exit(1);
+    }
+  }
+  if (tokens->kind == TK_WHILE)
+  {
+    tokens++;
+    is_while = 1;
     if (tokens->kind == TK_LeftParenthesis)
     {
       tokens++;
@@ -274,6 +289,12 @@ Stmt *parseStmt(Token **ptrptr, Token *token_end)
   if (is_if)
   {
     stmt->stmt_kind = SK_IF;
+    Stmt *statement = parseStmt(&tokens, token_end);
+    stmt->second_child = statement;
+  }
+  if (is_while)
+  {
+    stmt->stmt_kind = SK_WHILE;
     Stmt *statement = parseStmt(&tokens, token_end);
     stmt->second_child = statement;
   }

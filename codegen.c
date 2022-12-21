@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "9cc.h"
+
+int labelCounter = 0;
+
 void EvaluateLValueAddressIntoRax(Expr *expr)
 {
     if (expr->expr_kind == EK_Identifier)
@@ -39,12 +42,23 @@ void Codegen(Stmt *stmt)
         printf("  ret\n");
         break;
     }
-    case SK_IF:{
+    case SK_IF:
+    {
         EvaluateExprIntoRax(stmt->expr);
         printf("  cmp rax, 0\n");
-        printf("  je  .LendXXX\n");
+        printf("  je  .Lend%d\n",labelCounter);
         Codegen(stmt->second_child);
-        printf(".LendXXX:\n");
+        printf(".Lend%d:\n",labelCounter);
+        labelCounter++;
+        break;
+    }
+    case SK_WHILE:
+    {
+        printf(".Lend%d:\n",labelCounter);
+        EvaluateExprIntoRax(stmt->expr);
+        printf("  cmp rax, 0\n");
+        printf("  je  .Lend%d\n",labelCounter);
+        Codegen(stmt->second_child);
         break;
     }
     default:
