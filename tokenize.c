@@ -36,6 +36,14 @@ int tokenize(char *str)
             i += 5;
             continue;
         }
+        if (strncmp(ptr, "else", 4) == 0 && !is_alnum(ptr[4]))
+        {
+            Token token = {TK_ELSE, 0};
+            tokens[token_index] = token;
+            token_index++;
+            i += 4;
+            continue;
+        }
         switch (c)
         {
         case '+':

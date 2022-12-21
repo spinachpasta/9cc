@@ -46,6 +46,8 @@ typedef struct Stmt
 
   struct Stmt *first_child;
   struct Stmt *second_child;
+
+  struct Stmt *third_child;
 } Stmt;
 
 typedef struct LVar LVar;
@@ -83,6 +85,7 @@ enum TokenKind
   TK_Return,
   TK_IF,
   TK_WHILE,
+  TK_ELSE,
 };
 
 typedef struct Token

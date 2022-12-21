@@ -46,22 +46,28 @@ void Codegen(Stmt *stmt)
     {
         EvaluateExprIntoRax(stmt->expr);
         printf("  cmp rax, 0\n");
-        printf("  je  .Lend%d\n",labelCounter);
+        printf("  je  .Lelse%d\n", labelCounter);
         Codegen(stmt->second_child);
-        printf(".Lend%d:\n",labelCounter);
+        printf("  jmp .Lend%d\n", labelCounter);
+        printf(".Lelse%d:\n", labelCounter);
+        if (stmt->third_child != NULL)
+        {
+            Codegen(stmt->third_child);
+        }
+        printf(".Lend%d:\n", labelCounter);
         labelCounter++;
         break;
     }
     case SK_WHILE:
     {
-        printf(".Lbegin%d:\n",labelCounter);
+        printf(".Lbegin%d:\n", labelCounter);
         EvaluateExprIntoRax(stmt->expr);
         printf("  cmp rax, 0\n");
-        printf("  je  .Lend%d\n",labelCounter);
+        printf("  je  .Lend%d\n", labelCounter);
         Codegen(stmt->second_child);
-        printf("  jmp  .Lbegin%d\n",labelCounter);
-        printf(".Lend%d:\n",labelCounter);
-        
+        printf("  jmp  .Lbegin%d\n", labelCounter);
+        printf(".Lend%d:\n", labelCounter);
+
         labelCounter++;
         break;
     }

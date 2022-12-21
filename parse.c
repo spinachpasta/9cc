@@ -285,12 +285,22 @@ Stmt *parseStmt(Token **ptrptr, Token *token_end)
   stmt->stmt_kind = SK_Expr;
   stmt->first_child = NULL;
   stmt->second_child = NULL;
+  stmt->third_child = NULL;
   stmt->expr = expr;
   if (is_if)
   {
     stmt->stmt_kind = SK_IF;
-    Stmt *statement = parseStmt(&tokens, token_end);
-    stmt->second_child = statement;
+    {
+      Stmt *statement = parseStmt(&tokens, token_end);
+      stmt->second_child = statement;
+    }
+    Token maybe_else = *(tokens);
+    if (maybe_else.kind == TK_ELSE)
+    {
+      tokens++;
+      Stmt *statement1 = parseStmt(&tokens, token_end);
+      stmt->third_child = statement1;
+    }
   }
   if (is_while)
   {
