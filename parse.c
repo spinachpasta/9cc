@@ -207,6 +207,26 @@ Expr *parseAssign(Token **ptrptr, Token *token_end)
   *ptrptr = tokens;
   return result;
 }
+
+Expr *parseOptionalExprAndToken(Token **ptrptr, Token *token_end, enum TokenKind target)
+{
+  Token *tokens = *ptrptr;
+  if (tokens->kind == target)
+  {
+    tokens++;
+    *ptrptr = tokens;
+    return NULL;
+  }
+  Expr *expr = parseExpr(&tokens, token_end);
+  if (tokens->kind == target)
+  {
+    tokens++;
+    *ptrptr = tokens;
+    return expr;
+  }
+  fprintf(stderr, "expected TokenKind#%d after optional expression but did not find one", target);
+}
+
 Stmt *parseFor(Token **ptrptr, Token *token_end)
 {
   Token *tokens = *ptrptr;
@@ -222,46 +242,10 @@ Stmt *parseFor(Token **ptrptr, Token *token_end)
     exit(1);
   }
   Expr *exprs[3] = {NULL, NULL, NULL};
-  for (int i = 0; i < 3; i++)
-  {
-    {
-      Token maybe_operator = *tokens;
-      if (maybe_operator.kind == TK_Semicolon)
-      {
-        tokens++;
-        continue;
-      }
-      else
-      {
-        Expr *expr = parseExpr(&tokens, token_end);
-        exprs[i] = expr;
-      }
-    }
-    if (i <= 1)
-    {
-      Token maybe_operator = *tokens;
-      if (maybe_operator.kind == TK_Semicolon)
-      {
-        tokens++;
-      }
-      else
-      {
-        fprintf(stderr, "no semicolon after expr. kind=%d\n", maybe_operator.kind);
-        exit(1);
-      }
-    }
-  }
+  exprs[0] = parseOptionalExprAndToken(&tokens, token_end, TK_Semicolon);
+  exprs[1] = parseOptionalExprAndToken(&tokens, token_end, TK_Semicolon);
+  exprs[2] = parseOptionalExprAndToken(&tokens, token_end, TK_RightParenthesis);
 
-  Token maybe_parenthesis = *tokens;
-  if (maybe_parenthesis.kind == TK_RightParenthesis)
-  {
-    tokens++;
-  }
-  else
-  {
-    fprintf(stderr, "expected right parenthesis got %d\n", maybe_parenthesis.kind);
-    exit(1);
-  }
   Stmt *stmt = malloc(sizeof(Stmt));
   stmt->stmt_kind = SK_FOR;
   stmt->first_child = NULL;

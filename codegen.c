@@ -73,13 +73,26 @@ void Codegen(Stmt *stmt)
     }
     case SK_FOR:
     {
-        EvaluateExprIntoRax(stmt->expr);
+        if (stmt->expr)
+        {
+            EvaluateExprIntoRax(stmt->expr);
+        }
         printf(".Lbegin%d:\n", labelCounter);
-        EvaluateExprIntoRax(stmt->expr1);
+        if (stmt->expr1)
+        {
+            EvaluateExprIntoRax(stmt->expr1);
+        }
+        else
+        {
+            printf("  mov rax, 1\n");
+        }
         printf("  cmp rax, 0\n");
         printf("  je  .Lend%d\n", labelCounter);
         Codegen(stmt->second_child);
-        EvaluateExprIntoRax(stmt->expr2);
+        if (stmt->expr2)
+        {
+            EvaluateExprIntoRax(stmt->expr2);
+        }
         printf("  jmp  .Lbegin%d\n", labelCounter);
         printf(".Lend%d:\n", labelCounter);
 
