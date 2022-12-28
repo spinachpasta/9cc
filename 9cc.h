@@ -96,7 +96,7 @@ typedef struct Token
 {
   enum TokenKind kind;
   int value;
-  char* name;
+  char* identifier_name;
 } Token;
 
 // prototype declaration

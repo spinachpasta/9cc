@@ -139,7 +139,7 @@ Expr *parsePrimary(Token **ptrptr, Token *token_end)
   else if (maybe_number->kind == TK_Identifier)
   {
     *ptrptr += 1;
-    return identifierexpr(maybe_number->name);
+    return identifierexpr(maybe_number->identifier_name);
   }
   else
   {
@@ -225,6 +225,7 @@ Expr *parseOptionalExprAndToken(Token **ptrptr, Token *token_end, enum TokenKind
     return expr;
   }
   fprintf(stderr, "expected TokenKind#%d after optional expression but did not find one", target);
+  exit(-1);
 }
 
 Stmt *parseFor(Token **ptrptr, Token *token_end)
