@@ -36,6 +36,7 @@ enum StmtKind{
   SK_Return,
   SK_IF,
   SK_WHILE,
+  SK_FOR,
 };
 
 typedef struct Stmt
@@ -43,6 +44,8 @@ typedef struct Stmt
   enum StmtKind stmt_kind;
   
   struct Expr *expr;
+  struct Expr *expr1;
+  struct Expr *expr2;
 
   struct Stmt *first_child;
   struct Stmt *second_child;
@@ -86,6 +89,7 @@ enum TokenKind
   TK_IF,
   TK_WHILE,
   TK_ELSE,
+  TK_FOR,
 };
 
 typedef struct Token
@@ -105,6 +109,9 @@ Expr *parseExpr(Token **ptrptr, Token *token_end);
 Expr *parseUnary(Token **ptrptr, Token *token_end);
 Stmt *parseProgram(Token **ptrptr, Token *token_end);
 Expr *parseAssign(Token **ptrptr, Token *token_end);
+Stmt *parseFor(Token **ptrptr,Token *token_end);
+Stmt *parseStmt(Token **ptrptr, Token *token_end);
+
 void Codegen(Stmt* stmt);
 
 int tokenize(char *str);

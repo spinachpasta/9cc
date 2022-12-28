@@ -71,6 +71,21 @@ void Codegen(Stmt *stmt)
         labelCounter++;
         break;
     }
+    case SK_FOR:
+    {
+        EvaluateExprIntoRax(stmt->expr);
+        printf(".Lbegin%d:\n", labelCounter);
+        EvaluateExprIntoRax(stmt->expr1);
+        printf("  cmp rax, 0\n");
+        printf("  je  .Lend%d\n", labelCounter);
+        Codegen(stmt->second_child);
+        EvaluateExprIntoRax(stmt->expr2);
+        printf("  jmp  .Lbegin%d\n", labelCounter);
+        printf(".Lend%d:\n", labelCounter);
+
+        labelCounter++;
+        break;
+    }
     default:
         break;
     }

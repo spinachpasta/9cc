@@ -207,8 +207,81 @@ Expr *parseAssign(Token **ptrptr, Token *token_end)
   *ptrptr = tokens;
   return result;
 }
+Stmt *parseFor(Token **ptrptr, Token *token_end)
+{
+  Token *tokens = *ptrptr;
+  tokens++;
+
+  if (tokens->kind == TK_LeftParenthesis)
+  {
+    tokens++;
+  }
+  else
+  {
+    fprintf(stderr, "expected left parenthesis got %d\n", tokens->kind);
+    exit(1);
+  }
+  Expr *exprs[3] = {NULL, NULL, NULL};
+  for (int i = 0; i < 3; i++)
+  {
+    {
+      Token maybe_operator = *tokens;
+      if (maybe_operator.kind == TK_Semicolon)
+      {
+        tokens++;
+        continue;
+      }
+      else
+      {
+        Expr *expr = parseExpr(&tokens, token_end);
+        exprs[i] = expr;
+      }
+    }
+    if (i <= 1)
+    {
+      Token maybe_operator = *tokens;
+      if (maybe_operator.kind == TK_Semicolon)
+      {
+        tokens++;
+      }
+      else
+      {
+        fprintf(stderr, "no semicolon after expr. kind=%d\n", maybe_operator.kind);
+        exit(1);
+      }
+    }
+  }
+
+  Token maybe_parenthesis = *tokens;
+  if (maybe_parenthesis.kind == TK_RightParenthesis)
+  {
+    tokens++;
+  }
+  else
+  {
+    fprintf(stderr, "expected right parenthesis got %d\n", maybe_parenthesis.kind);
+    exit(1);
+  }
+  Stmt *stmt = malloc(sizeof(Stmt));
+  stmt->stmt_kind = SK_FOR;
+  stmt->first_child = NULL;
+  stmt->second_child = NULL;
+  stmt->third_child = NULL;
+  stmt->expr = exprs[0];
+  stmt->expr1 = exprs[1];
+  stmt->expr2 = exprs[2];
+
+  Stmt *statement = parseStmt(&tokens, token_end);
+  stmt->second_child = statement;
+
+  *ptrptr = tokens;
+
+  return stmt;
+}
 // statement= expr ";"
 //        | "if" "(" expr ")" stmt ("else" stmt)?
+//        | "while" "(" expr ")" stmt ?
+//        | for?
 Stmt *parseStmt(Token **ptrptr, Token *token_end)
 {
   Token *tokens = *ptrptr;
@@ -220,6 +293,7 @@ Stmt *parseStmt(Token **ptrptr, Token *token_end)
   int is_return = 0;
   int is_if = 0;
   int is_while = 0;
+
   if (tokens->kind == TK_Return)
   {
     tokens++;
@@ -252,6 +326,12 @@ Stmt *parseStmt(Token **ptrptr, Token *token_end)
       fprintf(stderr, "expected right parenthesis got %d\n", tokens->kind);
       exit(1);
     }
+  }
+  if (tokens->kind == TK_FOR)
+  {
+    Stmt *stmt = parseFor(&tokens, token_end);
+    *ptrptr = tokens;
+    return stmt;
   }
   Expr *expr = parseExpr(&tokens, token_end);
   {
