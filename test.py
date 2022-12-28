@@ -105,7 +105,7 @@ assert check("a=0;while(a<5)a=a+1; return a;",5);
 assert check("a=0;if(a)return 5;else a=10;return a;",10);
 assert check("a=1;if(a)a=0;else return 10;return a;",0);
 
+assert check("for(a=0;a<10;a=a+1)b=a;return b;",9);
 assert check("for(;;)return 0;",9);
-assert check("for(a=0;a<10;a=a+1)b=a;",9);
 
 print("OK")
