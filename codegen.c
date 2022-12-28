@@ -42,7 +42,7 @@ void Codegen(Stmt *stmt)
         printf("  ret\n");
         break;
     }
-    case SK_IF:
+    case SK_If:
     {
         EvaluateExprIntoRax(stmt->expr);
         printf("  cmp rax, 0\n");
@@ -58,7 +58,7 @@ void Codegen(Stmt *stmt)
         labelCounter++;
         break;
     }
-    case SK_WHILE:
+    case SK_While:
     {
         printf(".Lbegin%d:\n", labelCounter);
         EvaluateExprIntoRax(stmt->expr);
@@ -71,7 +71,7 @@ void Codegen(Stmt *stmt)
         labelCounter++;
         break;
     }
-    case SK_FOR:
+    case SK_For:
     {
         if (stmt->expr)
         {

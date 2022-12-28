@@ -247,7 +247,7 @@ Stmt *parseFor(Token **ptrptr, Token *token_end)
   exprs[2] = parseOptionalExprAndToken(&tokens, token_end, TK_RightParenthesis);
 
   Stmt *stmt = malloc(sizeof(Stmt));
-  stmt->stmt_kind = SK_FOR;
+  stmt->stmt_kind = SK_For;
   stmt->first_child = NULL;
   stmt->second_child = NULL;
   stmt->third_child = NULL;
@@ -353,7 +353,7 @@ Stmt *parseStmt(Token **ptrptr, Token *token_end)
   stmt->expr = expr;
   if (is_if)
   {
-    stmt->stmt_kind = SK_IF;
+    stmt->stmt_kind = SK_If;
     {
       Stmt *statement = parseStmt(&tokens, token_end);
       stmt->second_child = statement;
@@ -368,7 +368,7 @@ Stmt *parseStmt(Token **ptrptr, Token *token_end)
   }
   if (is_while)
   {
-    stmt->stmt_kind = SK_WHILE;
+    stmt->stmt_kind = SK_While;
     Stmt *statement = parseStmt(&tokens, token_end);
     stmt->second_child = statement;
   }

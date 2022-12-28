@@ -34,9 +34,9 @@ enum StmtKind{
   SK_AndThen,
   SK_Expr,
   SK_Return,
-  SK_IF,
-  SK_WHILE,
-  SK_FOR,
+  SK_If,
+  SK_While,
+  SK_For,
 };
 
 typedef struct Stmt
