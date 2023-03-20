@@ -37,6 +37,7 @@ enum StmtKind{
   SK_If,
   SK_While,
   SK_For,
+  SK_Block,
 };
 
 typedef struct Stmt
@@ -76,6 +77,8 @@ enum TokenKind
   TK_Div,
   TK_LeftParenthesis,
   TK_RightParenthesis,
+  TK_LeftCurlyBrace,
+  TK_RightCurlyBrace,
   TK_Equal,
   TK_NotEqual,
   TK_Greater,

@@ -279,6 +279,29 @@ Stmt *parseStmt(Token **ptrptr, Token *token_end)
   int is_if = 0;
   int is_while = 0;
 
+  if (tokens->kind == TK_LeftCurlyBrace)
+  {
+    tokens++;
+
+    Stmt *result = parseStmt(&tokens, token_end);
+    for (;;)
+    {
+      if (tokens->kind == TK_RightCurlyBrace)
+      {
+        tokens++;
+        break;
+      }
+      Stmt *stmt = parseStmt(&tokens, token_end);
+      Stmt *andthen = calloc(1, sizeof(Stmt));
+      andthen->first_child = result;
+      andthen->stmt_kind = SK_AndThen;
+      andthen->second_child = stmt;
+      result = andthen;
+    }
+    *ptrptr = tokens;
+    return result;
+  }
+
   if (tokens->kind == TK_Return)
   {
     tokens++;
@@ -394,11 +417,11 @@ Stmt *parseProgram(Token **ptrptr, Token *token_end)
   for (; tokens < token_end;)
   {
     Stmt *statement = parseStmt(&tokens, token_end);
-    Stmt *newexp = calloc(1, sizeof(Stmt));
-    newexp->first_child = result;
-    newexp->stmt_kind = SK_AndThen;
-    newexp->second_child = statement;
-    result = newexp;
+    Stmt *andthen = calloc(1, sizeof(Stmt));
+    andthen->first_child = result;
+    andthen->stmt_kind = SK_AndThen;
+    andthen->second_child = statement;
+    result = andthen;
   }
   *ptrptr = tokens;
   return result;

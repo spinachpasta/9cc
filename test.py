@@ -108,4 +108,9 @@ assert check("a=1;if(a)a=0;else return 10;return a;",0);
 assert check("for(a=0;a<10;a=a+1)b=a;return b;",9);
 assert check("for(;;)return 0;",0);
 
+
+assert check("b=0;for(a=0;a<10;a=a+1){b=b+1;b=b+2;}return b;",30);
+assert check("b=0;for(a=0;a<10;a=a+1){b=b+3;}return b;",30);
+assert check("b=0;{b=b+3;}return b;",3);
+
 print("OK")
