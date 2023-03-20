@@ -18,6 +18,24 @@ abc:
 	.cfi_endproc
 .LFE0:
 	.size	abc, .-abc
+	.globl	three
+	.type	three, @function
+three:
+.LFB1:
+	.cfi_startproc
+	endbr64
+	pushq	%rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	movq	%rsp, %rbp
+	.cfi_def_cfa_register 6
+	movl	$3, %eax
+	popq	%rbp
+	.cfi_def_cfa 7, 8
+	ret
+	.cfi_endproc
+.LFE1:
+	.size	three, .-three
 	.ident	"GCC: (Ubuntu 11.3.0-1ubuntu1~22.04) 11.3.0"
 	.section	.note.GNU-stack,"",@progbits
 	.section	.note.gnu.property,"a"
