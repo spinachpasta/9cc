@@ -10,6 +10,14 @@ Expr *numberexpr(int value)
   return numberexp;
 }
 
+Expr *callfunctionexpr(char *name)
+{
+  Expr *numberexp = calloc(1, sizeof(Expr));
+  numberexp->name = name;
+  numberexp->expr_kind = EK_CallFunction;
+  return numberexp;
+}
+
 Expr *identifierexpr(char *name)
 {
   Expr *numberexp = calloc(1, sizeof(Expr));
@@ -139,7 +147,23 @@ Expr *parsePrimary(Token **ptrptr, Token *token_end)
   else if (maybe_number->kind == TK_Identifier)
   {
     *ptrptr += 1;
-    return identifierexpr(maybe_number->identifier_name);
+    Token *maybe_leftparenthesis = *ptrptr;
+    if (maybe_leftparenthesis->kind == TK_LeftParenthesis)
+    {
+      *ptrptr += 1;
+      Token *maybe_rightparenthesis = *ptrptr;
+      if (maybe_rightparenthesis->kind != TK_RightParenthesis)
+      {
+        fprintf(stderr, "Expected: right parenthesis. Token Kind:%d", maybe_rightparenthesis->kind);
+        exit(1);
+      }
+      *ptrptr += 1;
+      return callfunctionexpr(maybe_number->identifier_name);
+    }
+    else
+    {
+      return identifierexpr(maybe_number->identifier_name);
+    }
   }
   else
   {

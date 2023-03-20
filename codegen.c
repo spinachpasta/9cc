@@ -107,6 +107,9 @@ void EvaluateExprIntoRax(Expr *expr)
 {
     switch (expr->expr_kind)
     {
+    case EK_CallFunction:
+        printf("   call %s\n", expr->name);
+        break;
     case EK_Identifier:
         EvaluateLValueAddressIntoRax(expr);
         printf("  mov rax,[rax]\n");

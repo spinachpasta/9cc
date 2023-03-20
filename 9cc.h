@@ -18,6 +18,7 @@ enum ExprKind
   EK_Number,
   EK_Operator,
   EK_Identifier,
+  EK_CallFunction,
 };
 
 typedef struct Expr

@@ -23,6 +23,18 @@ def check(input: str, expected: int):
     print(f"{bcolors.FAIL}FAIL:check:{input=} {expected=} {returned_value=}{bcolors.ENDC}")
     return False
 
+def checkandlink(input: str, expected: int):
+    os.system(f'./9cc "{input}" > tmp.s')
+    os.system("gcc -S testfunc.c -o testfunc.s")
+    os.system("cc -o tmp tmp.s testfunc.s")
+    returned_value = (os.system("./tmp") >> 8) & 0xff
+
+    if expected == returned_value:
+        print(f"{bcolors.OKGREEN}passed:{input=} {expected=} {bcolors.ENDC}")
+        return True
+
+    print(f"{bcolors.FAIL}FAIL:check:{input=} {expected=} {returned_value=}{bcolors.ENDC}")
+    return False
 
 assert check("return 0;", 0)
 
@@ -109,8 +121,9 @@ assert check("for(a=0;a<10;a=a+1)b=a;return b;",9);
 assert check("for(;;)return 0;",0);
 
 
-assert check("b=0;for(a=0;a<10;a=a+1){b=b+1;b=b+2;}return b;",30);
 assert check("b=0;for(a=0;a<10;a=a+1){b=b+3;}return b;",30);
 assert check("b=0;{b=b+3;}return b;",3);
+assert check("b=0;for(a=0;a<10;a=a+1){b=b+1;b=b+2;}return b;",30);
 
+assert checkandlink("return abc();",3);
 print("OK")
