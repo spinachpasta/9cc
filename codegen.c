@@ -18,6 +18,18 @@ void EvaluateLValueAddressIntoRax(Expr *expr)
         exit(1);
     }
 }
+
+void CodegenFunction(Function *func)
+{
+    printf(".globl %s\n",func->name);
+    printf("%s:\n", func->name);
+    // prologue
+    printf("  push rbp\n");
+    printf("  mov rbp, rsp\n");
+    printf("  sub rsp, 208\n");
+    Codegen(func->content);
+}
+
 void Codegen(Stmt *stmt)
 {
     switch (stmt->stmt_kind)

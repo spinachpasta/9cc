@@ -24,15 +24,12 @@ int main(int argc, char **argv)
 
     Token *ptr = tokens;
     Token *token_end = tokens + token_length;
-    Stmt *expr = parseProgram(&ptr, token_end);
-
     printf(".intel_syntax noprefix\n");
-    printf(".globl main\n");
-    printf("main:\n");
-    // prologue
-    printf("  push rbp\n");
-    printf("  mov rbp, rsp\n");
-    printf("  sub rsp, 208\n");
-    Codegen(expr);
+    for (; ptr < token_end;)
+    {
+        Function *func = parseFunction(&ptr, token_end);
+        CodegenFunction(func);
+    }
+
     return 0;
 }

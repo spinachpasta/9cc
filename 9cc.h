@@ -127,8 +127,8 @@ Expr *parseAssign(Token **ptrptr, Token *token_end);
 Stmt *parseFor(Token **ptrptr,Token *token_end);
 Stmt *parseStmt(Token **ptrptr, Token *token_end);
 void consumeOrDie(Token **ptrptr, Token *token_end, enum TokenKind kind);
-Stmt *parseProgram(Token **ptrptr, Token *token_end);
 Function *parseFunction(Token **ptrptr, Token *token_end);
+void CodegenFunction(Function* func);
 
 void Codegen(Stmt* stmt);
 

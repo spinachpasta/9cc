@@ -459,10 +459,16 @@ Stmt *parseFunctionContent(Token **ptrptr, Token *token_end)
     fprintf(stderr, "No token found");
     exit(1);
   }
+  consumeOrDie(&tokens, token_end, TK_LeftCurlyBrace);
   Stmt *result = parseStmt(&tokens, token_end);
 
   for (; tokens < token_end;)
   {
+    if (tokens->kind == TK_RightCurlyBrace)
+    {
+      tokens += 1;
+      break;
+    }
     Stmt *statement = parseStmt(&tokens, token_end);
     Stmt *andthen = calloc(1, sizeof(Stmt));
     andthen->first_child = result;
@@ -473,16 +479,7 @@ Stmt *parseFunctionContent(Token **ptrptr, Token *token_end)
   *ptrptr = tokens;
   return result;
 }
-Stmt *parseProgram(Token **ptrptr, Token *token_end)
-{
-  Function *func = parseFunction(ptrptr, token_end);
-  if (strcmp(func->name, "main") != 0)
-  {
-    fprintf(stderr, "Expected main but got %s", func->name);
-    exit(1);
-  }
-  return func->content;
-}
+
 Function *parseFunction(Token **ptrptr, Token *token_end)
 {
   Token *tokens = *ptrptr;

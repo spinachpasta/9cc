@@ -102,3 +102,6 @@ assert checkandlink("main(){return thirdarg(1,2,3,4,5,6);}", 3)
 assert checkandlink("main(){return fourtharg(1,2,3,4,5,6);}", 4)
 assert checkandlink("main(){return fiftharg(1,2,3,4,5,6);}", 5)
 assert checkandlink("main(){return sixtharg(1,2,3,4,5,6);}", 6)
+
+
+assert check("myfunc(){return 10;} main(){return myfunc();}", 10)
