@@ -475,6 +475,16 @@ Stmt *parseFunctionContent(Token **ptrptr, Token *token_end)
 }
 Stmt *parseProgram(Token **ptrptr, Token *token_end)
 {
+  Function *func = parseFunction(ptrptr, token_end);
+  if (strcmp(func->name, "main") != 0)
+  {
+    fprintf(stderr, "Expected main but got %s", func->name);
+    exit(1);
+  }
+  return func->content;
+}
+Function *parseFunction(Token **ptrptr, Token *token_end)
+{
   Token *tokens = *ptrptr;
   if (token_end == tokens)
   {
@@ -486,11 +496,7 @@ Stmt *parseProgram(Token **ptrptr, Token *token_end)
     fprintf(stderr, "Expected Identifier but got: %d", tokens->kind);
     exit(1);
   }
-  if (strcmp(tokens->identifier_name, "main") != 0)
-  {
-    fprintf(stderr, "Expected main but got %s", tokens->identifier_name);
-    exit(1);
-  }
+  char *function_name = tokens->identifier_name;
   tokens += 1;
 
   consumeOrDie(&tokens, token_end, TK_LeftParenthesis);
@@ -500,9 +506,12 @@ Stmt *parseProgram(Token **ptrptr, Token *token_end)
     fprintf(stderr, "Expected { but got: %d", tokens->kind);
     exit(1);
   }
-  Stmt *func = parseFunctionContent(&tokens, token_end);
+  Stmt *content = parseFunctionContent(&tokens, token_end);
   // consumeOrDie(&tokens, token_end, TK_RightCurlyBrace);
   *ptrptr = tokens;
+  Function *func = malloc(sizeof(Function));
+  func->name = function_name;
+  func->content = content;
   return func;
 }
 
