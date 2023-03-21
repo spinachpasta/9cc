@@ -28,6 +28,7 @@ typedef struct Expr
   int value;
   struct Expr *first_child;
   struct Expr *second_child;
+  struct Expr *argments[6];
   char* name;
 } Expr;
 

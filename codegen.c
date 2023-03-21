@@ -108,9 +108,9 @@ void EvaluateExprIntoRax(Expr *expr)
     switch (expr->expr_kind)
     {
     case EK_CallFunction:
-        if (expr->first_child)
+        if (expr->argments[0])
         {
-            EvaluateExprIntoRax(expr->first_child);
+            EvaluateExprIntoRax(expr->argments[0]);
         }
         printf("   mov rdi, rax\n");
         /*

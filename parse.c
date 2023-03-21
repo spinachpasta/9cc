@@ -15,7 +15,7 @@ Expr *callfunctionexpr(char *name, Expr *argument)
   Expr *expr = calloc(1, sizeof(Expr));
   expr->name = name;
   expr->expr_kind = EK_CallFunction;
-  expr->first_child = argument;
+  expr->argments[0] = argument;
   return expr;
 }
 
