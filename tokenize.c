@@ -63,6 +63,15 @@ int tokenize(char *str)
             i++;
             break;
         }
+        case ',':
+        {
+            /* code */
+            Token token = {TK_Comma, 0, NULL};
+            tokens[token_index] = token;
+            token_index++;
+            i++;
+            break;
+        }
         case ';':
         {
             /* code */

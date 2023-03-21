@@ -55,6 +55,206 @@ identity:
 	.cfi_endproc
 .LFE2:
 	.size	identity, .-identity
+	.globl	add
+	.type	add, @function
+add:
+.LFB3:
+	.cfi_startproc
+	endbr64
+	pushq	%rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	movq	%rsp, %rbp
+	.cfi_def_cfa_register 6
+	movl	%edi, -4(%rbp)
+	movl	%esi, -8(%rbp)
+	movl	-4(%rbp), %edx
+	movl	-8(%rbp), %eax
+	addl	%edx, %eax
+	popq	%rbp
+	.cfi_def_cfa 7, 8
+	ret
+	.cfi_endproc
+.LFE3:
+	.size	add, .-add
+	.globl	addsix
+	.type	addsix, @function
+addsix:
+.LFB4:
+	.cfi_startproc
+	endbr64
+	pushq	%rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	movq	%rsp, %rbp
+	.cfi_def_cfa_register 6
+	movl	%edi, -4(%rbp)
+	movl	%esi, -8(%rbp)
+	movl	%edx, -12(%rbp)
+	movl	%ecx, -16(%rbp)
+	movl	%r8d, -20(%rbp)
+	movl	%r9d, -24(%rbp)
+	movl	-4(%rbp), %edx
+	movl	-8(%rbp), %eax
+	addl	%eax, %edx
+	movl	-12(%rbp), %eax
+	addl	%eax, %edx
+	movl	-16(%rbp), %eax
+	addl	%eax, %edx
+	movl	-20(%rbp), %eax
+	addl	%eax, %edx
+	movl	-24(%rbp), %eax
+	addl	%edx, %eax
+	popq	%rbp
+	.cfi_def_cfa 7, 8
+	ret
+	.cfi_endproc
+.LFE4:
+	.size	addsix, .-addsix
+	.globl	firstarg
+	.type	firstarg, @function
+firstarg:
+.LFB5:
+	.cfi_startproc
+	endbr64
+	pushq	%rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	movq	%rsp, %rbp
+	.cfi_def_cfa_register 6
+	movl	%edi, -4(%rbp)
+	movl	%esi, -8(%rbp)
+	movl	%edx, -12(%rbp)
+	movl	%ecx, -16(%rbp)
+	movl	%r8d, -20(%rbp)
+	movl	%r9d, -24(%rbp)
+	movl	-4(%rbp), %eax
+	popq	%rbp
+	.cfi_def_cfa 7, 8
+	ret
+	.cfi_endproc
+.LFE5:
+	.size	firstarg, .-firstarg
+	.globl	secondarg
+	.type	secondarg, @function
+secondarg:
+.LFB6:
+	.cfi_startproc
+	endbr64
+	pushq	%rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	movq	%rsp, %rbp
+	.cfi_def_cfa_register 6
+	movl	%edi, -4(%rbp)
+	movl	%esi, -8(%rbp)
+	movl	%edx, -12(%rbp)
+	movl	%ecx, -16(%rbp)
+	movl	%r8d, -20(%rbp)
+	movl	%r9d, -24(%rbp)
+	movl	-8(%rbp), %eax
+	popq	%rbp
+	.cfi_def_cfa 7, 8
+	ret
+	.cfi_endproc
+.LFE6:
+	.size	secondarg, .-secondarg
+	.globl	thirdarg
+	.type	thirdarg, @function
+thirdarg:
+.LFB7:
+	.cfi_startproc
+	endbr64
+	pushq	%rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	movq	%rsp, %rbp
+	.cfi_def_cfa_register 6
+	movl	%edi, -4(%rbp)
+	movl	%esi, -8(%rbp)
+	movl	%edx, -12(%rbp)
+	movl	%ecx, -16(%rbp)
+	movl	%r8d, -20(%rbp)
+	movl	%r9d, -24(%rbp)
+	movl	-12(%rbp), %eax
+	popq	%rbp
+	.cfi_def_cfa 7, 8
+	ret
+	.cfi_endproc
+.LFE7:
+	.size	thirdarg, .-thirdarg
+	.globl	fourtharg
+	.type	fourtharg, @function
+fourtharg:
+.LFB8:
+	.cfi_startproc
+	endbr64
+	pushq	%rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	movq	%rsp, %rbp
+	.cfi_def_cfa_register 6
+	movl	%edi, -4(%rbp)
+	movl	%esi, -8(%rbp)
+	movl	%edx, -12(%rbp)
+	movl	%ecx, -16(%rbp)
+	movl	%r8d, -20(%rbp)
+	movl	%r9d, -24(%rbp)
+	movl	-16(%rbp), %eax
+	popq	%rbp
+	.cfi_def_cfa 7, 8
+	ret
+	.cfi_endproc
+.LFE8:
+	.size	fourtharg, .-fourtharg
+	.globl	fiftharg
+	.type	fiftharg, @function
+fiftharg:
+.LFB9:
+	.cfi_startproc
+	endbr64
+	pushq	%rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	movq	%rsp, %rbp
+	.cfi_def_cfa_register 6
+	movl	%edi, -4(%rbp)
+	movl	%esi, -8(%rbp)
+	movl	%edx, -12(%rbp)
+	movl	%ecx, -16(%rbp)
+	movl	%r8d, -20(%rbp)
+	movl	%r9d, -24(%rbp)
+	movl	-20(%rbp), %eax
+	popq	%rbp
+	.cfi_def_cfa 7, 8
+	ret
+	.cfi_endproc
+.LFE9:
+	.size	fiftharg, .-fiftharg
+	.globl	sixtharg
+	.type	sixtharg, @function
+sixtharg:
+.LFB10:
+	.cfi_startproc
+	endbr64
+	pushq	%rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	movq	%rsp, %rbp
+	.cfi_def_cfa_register 6
+	movl	%edi, -4(%rbp)
+	movl	%esi, -8(%rbp)
+	movl	%edx, -12(%rbp)
+	movl	%ecx, -16(%rbp)
+	movl	%r8d, -20(%rbp)
+	movl	%r9d, -24(%rbp)
+	movl	-24(%rbp), %eax
+	popq	%rbp
+	.cfi_def_cfa 7, 8
+	ret
+	.cfi_endproc
+.LFE10:
+	.size	sixtharg, .-sixtharg
 	.ident	"GCC: (Ubuntu 11.3.0-1ubuntu1~22.04) 11.3.0"
 	.section	.note.GNU-stack,"",@progbits
 	.section	.note.gnu.property,"a"

@@ -10,12 +10,15 @@ Expr *numberexpr(int value)
   return numberexp;
 }
 
-Expr *callfunctionexpr(char *name, Expr *argument)
+Expr *callfunctionexpr(char *name, Expr **arguments)
 {
   Expr *expr = calloc(1, sizeof(Expr));
   expr->name = name;
   expr->expr_kind = EK_CallFunction;
-  expr->argments[0] = argument;
+  for (int i = 0; i < 6; i++)
+  {
+    expr->argments[i] = arguments[i];
+  }
   return expr;
 }
 
@@ -153,11 +156,23 @@ Expr *parsePrimary(Token **ptrptr, Token *token_end)
     {
       *ptrptr += 1;
       Token *maybe_rightparenthesis = *ptrptr;
-      Expr *argument = NULL;
-
+      Expr *arguments[] = {NULL, NULL, NULL, NULL, NULL, NULL};
       if (maybe_rightparenthesis->kind != TK_RightParenthesis)
       {
-        argument = parseExpr(ptrptr, token_end);
+        arguments[0] = parseExpr(ptrptr, token_end);
+        for (int i = 1; i < 6; i++)
+        {
+          Token *maybe_comma = *ptrptr;
+          if (maybe_comma->kind == TK_Comma)
+          {
+            *ptrptr += 1;
+            arguments[i] = parseExpr(ptrptr, token_end);
+          }
+          else
+          {
+            break;
+          }
+        }
         maybe_rightparenthesis = *ptrptr;
         if (maybe_rightparenthesis->kind != TK_RightParenthesis)
         {
@@ -166,7 +181,7 @@ Expr *parsePrimary(Token **ptrptr, Token *token_end)
         }
       }
       *ptrptr += 1;
-      return callfunctionexpr(maybe_number->identifier_name, argument);
+      return callfunctionexpr(maybe_number->identifier_name, arguments);
     }
     else
     {

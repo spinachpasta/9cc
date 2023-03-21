@@ -95,6 +95,7 @@ enum TokenKind
   TK_WHILE,
   TK_ELSE,
   TK_FOR,
+  TK_Comma,
 };
 
 typedef struct Token
