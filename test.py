@@ -127,4 +127,7 @@ assert check("b=0;for(a=0;a<10;a=a+1){b=b+1;b=b+2;}return b;",30);
 
 assert checkandlink("return abc();",3);
 assert checkandlink("return three();",3);
+assert checkandlink("return identity(5);",5);
+assert checkandlink("return identity(three());",3);
+assert checkandlink("return identity(three()*2);",6);
 print("OK")

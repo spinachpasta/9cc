@@ -14,7 +14,7 @@ void EvaluateLValueAddressIntoRax(Expr *expr)
     }
     else
     {
-        fprintf(stderr, "not lvalue");
+        fprintf(stderr, "not lvalue:expr kind=%d",expr->expr_kind);
         exit(1);
     }
 }
@@ -108,6 +108,19 @@ void EvaluateExprIntoRax(Expr *expr)
     switch (expr->expr_kind)
     {
     case EK_CallFunction:
+        if (expr->first_child)
+        {
+            EvaluateExprIntoRax(expr->first_child);
+        }
+        printf("   mov rdi, rax\n");
+        /*
+                mov     r9d, 6
+    mov     r8d, 5
+    mov     ecx, 4
+    mov     edx, 3
+    mov     esi, 2
+    mov     edi, 1
+        */
         printf("   call %s\n", expr->name);
         break;
     case EK_Identifier:

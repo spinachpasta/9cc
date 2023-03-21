@@ -4,3 +4,7 @@ int abc(){
 int three(){
 	return 3;
 }
+
+int identity(int a){
+	return a;
+}
