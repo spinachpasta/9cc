@@ -8,7 +8,7 @@ OBJS=$(SRCS:.c=.o)
 $(OBJS): 9cc.h
 
 test: 9cc
-		python3 test.py 
+		python3 testcases.py 
 
 clean:
 		rm -f 9cc *.o *~ tmp*

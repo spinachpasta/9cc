@@ -96,6 +96,7 @@ enum TokenKind
   TK_ELSE,
   TK_FOR,
   TK_Comma,
+  TK_DefineFunction,
 };
 
 typedef struct Token
@@ -117,6 +118,8 @@ Stmt *parseProgram(Token **ptrptr, Token *token_end);
 Expr *parseAssign(Token **ptrptr, Token *token_end);
 Stmt *parseFor(Token **ptrptr,Token *token_end);
 Stmt *parseStmt(Token **ptrptr, Token *token_end);
+void consumeOrDie(Token **ptrptr, Token *token_end, enum TokenKind kind);
+Stmt *parseProgram(Token **ptrptr, Token *token_end);
 
 void Codegen(Stmt* stmt);
 

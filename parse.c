@@ -451,7 +451,7 @@ Stmt *parseStmt(Token **ptrptr, Token *token_end)
   return stmt;
 }
 // program = (expr ";")*
-Stmt *parseProgram(Token **ptrptr, Token *token_end)
+Stmt *parseFunctionContent(Token **ptrptr, Token *token_end)
 {
   Token *tokens = *ptrptr;
   if (token_end == tokens)
@@ -472,6 +472,50 @@ Stmt *parseProgram(Token **ptrptr, Token *token_end)
   }
   *ptrptr = tokens;
   return result;
+}
+Stmt *parseProgram(Token **ptrptr, Token *token_end)
+{
+  Token *tokens = *ptrptr;
+  if (token_end == tokens)
+  {
+    fprintf(stderr, "No token found");
+    exit(1);
+  }
+  if (tokens->kind != TK_Identifier)
+  {
+    fprintf(stderr, "Expected Identifier but got: %d", tokens->kind);
+    exit(1);
+  }
+  if (strcmp(tokens->identifier_name, "main") != 0)
+  {
+    fprintf(stderr, "Expected main but got %s", tokens->identifier_name);
+    exit(1);
+  }
+  tokens += 1;
+
+  consumeOrDie(&tokens, token_end, TK_LeftParenthesis);
+  consumeOrDie(&tokens, token_end, TK_RightParenthesis);
+  if (tokens->kind != TK_LeftCurlyBrace)
+  {
+    fprintf(stderr, "Expected { but got: %d", tokens->kind);
+    exit(1);
+  }
+  Stmt *func = parseFunctionContent(&tokens, token_end);
+  // consumeOrDie(&tokens, token_end, TK_RightCurlyBrace);
+  *ptrptr = tokens;
+  return func;
+}
+
+void consumeOrDie(Token **ptrptr, Token *token_end, enum TokenKind kind)
+{
+  Token *tokens = *ptrptr;
+  if (tokens->kind != kind)
+  {
+    fprintf(stderr, "Expected %d but got: %d", kind, tokens->kind);
+    exit(1);
+  }
+  tokens += 1;
+  *ptrptr = tokens;
 }
 
 // mul = unary ("*" unary | "/" unary)*
