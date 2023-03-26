@@ -1,6 +1,6 @@
 
 
-enum BinaryOperation{
+enum Operation{
   BO_Add,
   BO_Sub,
   BO_Mul,
@@ -10,20 +10,23 @@ enum BinaryOperation{
   BO_GreaterEqual,
   BO_NotEqual,
   BO_AndThen,
-  BO_Assign
+  BO_Assign,
+  UO_AddressOf,
+  UO_Deref,
 };
 
 enum ExprKind
 {
   EK_Number,
-  EK_Operator,
+  EK_BinaryOperator,
+  EK_UnaryOperator,
   EK_Identifier,
   EK_CallFunction,
 };
 
 typedef struct Expr
 {
-  enum BinaryOperation binary_op;
+  enum Operation op;
   enum ExprKind expr_kind;
   int value;
   struct Expr *first_child;
@@ -77,6 +80,7 @@ enum TokenKind
   TK_Plus,
   TK_Mul,
   TK_Div,
+  TK_And,
   TK_LeftParenthesis,
   TK_RightParenthesis,
   TK_LeftCurlyBrace,

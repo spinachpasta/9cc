@@ -134,6 +134,15 @@ int tokenize(char *str)
             i++;
             break;
         }
+        case '&':
+        {
+            /* code */
+            Token token = {TK_And, 0, NULL};
+            tokens[token_index] = token;
+            token_index++;
+            i++;
+            break;
+        }
         case '/':
         {
             Token token = {TK_Div, 0, NULL};

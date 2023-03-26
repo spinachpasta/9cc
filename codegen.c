@@ -162,9 +162,29 @@ void EvaluateExprIntoRax(Expr *expr)
     case EK_Number:
         printf("  mov rax, %d\n", expr->value);
         break;
-    case EK_Operator:
+    case EK_UnaryOperator:
     {
-        if (expr->binary_op == BO_Assign)
+        switch (expr->op)
+        {
+        case UO_Deref:
+            EvaluateExprIntoRax(expr->first_child);
+            printf("    mov rax,[rax]\n");
+            break;
+        case UO_AddressOf:
+            EvaluateLValueAddressIntoRax(expr->first_child);
+            break;
+        default:
+        {
+            fprintf(stderr, "Invalid unaryop kind:%d", expr->op);
+            exit(1);
+            break;
+        }
+        }
+        break;
+    }
+    case EK_BinaryOperator:
+    {
+        if (expr->op == BO_Assign)
         {
             EvaluateLValueAddressIntoRax(expr->first_child);
             printf("    push rax\n");
@@ -183,7 +203,7 @@ void EvaluateExprIntoRax(Expr *expr)
         printf("    pop rdi\n");
         printf("    pop rax\n");
 
-        switch (expr->binary_op)
+        switch (expr->op)
         {
         case BO_Add:
         {
@@ -241,7 +261,7 @@ void EvaluateExprIntoRax(Expr *expr)
         }
         default:
         {
-            fprintf(stderr, "Invalid binaryop kind:%d", expr->binary_op);
+            fprintf(stderr, "Invalid binaryop kind:%d", expr->op);
             exit(1);
             break;
         }

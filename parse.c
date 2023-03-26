@@ -30,17 +30,25 @@ Expr *identifierexpr(char *name)
   return numberexp;
 }
 
-Expr *binaryExpr(Expr *first_child, Expr *second_child, enum BinaryOperation binaryop)
+Expr *unaryExpr(Expr *child, enum Operation unaryop)
+{
+  Expr *newexp = calloc(1, sizeof(Expr));
+  newexp->first_child = child;
+  newexp->expr_kind = EK_UnaryOperator;
+  newexp->op = unaryop;
+  return newexp;
+}
+
+Expr *binaryExpr(Expr *first_child, Expr *second_child, enum Operation binaryop)
 {
   Expr *newexp = calloc(1, sizeof(Expr));
   newexp->first_child = first_child;
-  newexp->expr_kind = EK_Operator;
-  newexp->binary_op = binaryop;
+  newexp->expr_kind = EK_BinaryOperator;
+  newexp->op = binaryop;
   newexp->second_child = second_child;
   return newexp;
 }
 
-// relational = add ("<" add | "<=" add | ">" add | ">=" add)*
 Expr *parseRelational(Token **ptrptr, Token *token_end)
 {
   Token *tokens = *ptrptr;
@@ -95,7 +103,6 @@ Expr *parseRelational(Token **ptrptr, Token *token_end)
   *ptrptr = tokens;
   return result;
 }
-// equality   = relational ("==" relational | "!=" relational)*
 Expr *parseEquality(Token **ptrptr, Token *token_end)
 {
   Token *tokens = *ptrptr;
@@ -134,7 +141,6 @@ Expr *parseEquality(Token **ptrptr, Token *token_end)
   *ptrptr = tokens;
   return result;
 }
-// primary    = num | ident | "(" expr ")"
 Expr *parsePrimary(Token **ptrptr, Token *token_end)
 {
   Token *maybe_number = *ptrptr;
@@ -208,7 +214,7 @@ Expr *parsePrimary(Token **ptrptr, Token *token_end)
     exit(1);
   }
 }
-// unary   = ("+" | "-")? primary
+
 Expr *parseUnary(Token **ptrptr, Token *token_end)
 {
   Token *maybe_unary = *ptrptr;
@@ -227,10 +233,19 @@ Expr *parseUnary(Token **ptrptr, Token *token_end)
     *ptrptr += 1;
     return binaryExpr(numberexpr(0), parsePrimary(ptrptr, token_end), BO_Sub);
   }
+  if (maybe_unary->kind == TK_Mul)
+  {
+    *ptrptr += 1;
+    return unaryExpr(parsePrimary(ptrptr, token_end), UO_Deref);
+  }
+  if (maybe_unary->kind == TK_And)
+  {
+    *ptrptr += 1;
+    return unaryExpr(parsePrimary(ptrptr, token_end), UO_AddressOf);
+  }
   return parsePrimary(ptrptr, token_end);
 }
 
-// expr       = equality
 Expr *parseExpr(Token **ptrptr, Token *token_end)
 {
   return parseAssign(ptrptr, token_end);
@@ -310,10 +325,7 @@ Stmt *parseFor(Token **ptrptr, Token *token_end)
 
   return stmt;
 }
-// statement= expr ";"
-//        | "if" "(" expr ")" stmt ("else" stmt)?
-//        | "while" "(" expr ")" stmt ?
-//        | for?
+
 Stmt *parseStmt(Token **ptrptr, Token *token_end)
 {
   Token *tokens = *ptrptr;
@@ -450,7 +462,6 @@ Stmt *parseStmt(Token **ptrptr, Token *token_end)
   *ptrptr = tokens;
   return stmt;
 }
-// program = (expr ";")*
 Stmt *parseFunctionContent(Token **ptrptr, Token *token_end)
 {
   Token *tokens = *ptrptr;
@@ -557,7 +568,6 @@ void consumeOrDie(Token **ptrptr, Token *token_end, enum TokenKind kind)
   *ptrptr = tokens;
 }
 
-// mul = unary ("*" unary | "/" unary)*
 Expr *parseMultiplicative(Token **ptrptr, Token *token_end)
 {
   Token *tokens = *ptrptr;
@@ -604,7 +614,6 @@ Expr *parseMultiplicative(Token **ptrptr, Token *token_end)
   return result;
 }
 
-// additive = mul ("+" mul | "-" mul)*
 Expr *parseAdditive(Token **ptrptr, Token *token_end)
 {
   Token *tokens = *ptrptr;
