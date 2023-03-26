@@ -338,6 +338,28 @@ Stmt *parseStmt(Token **ptrptr, Token *token_end)
   int is_if = 0;
   int is_while = 0;
 
+  if (tokens->kind == TK_Int)
+  {
+    tokens += 1;
+    consumeOrDie(&tokens, token_end, TK_Identifier);
+    consumeOrDie(&tokens, token_end, TK_Semicolon);
+    // Stmt *result = parseStmt(&tokens, token_end);
+    // *ptrptr = tokens;
+    // return result;
+    // if (tokens->kind == TK_Identifier)
+    // {
+
+    // }
+    Stmt *stmt = malloc(sizeof(Stmt));
+    stmt->stmt_kind = SK_Expr;
+    stmt->first_child = NULL;
+    stmt->second_child = NULL;
+    stmt->third_child = NULL;
+    stmt->expr = numberexpr(42);
+    *ptrptr = tokens;
+    return stmt;
+  }
+
   if (tokens->kind == TK_LeftCurlyBrace)
   {
     tokens++;
@@ -499,6 +521,8 @@ Function *parseFunction(Token **ptrptr, Token *token_end)
     fprintf(stderr, "No token found");
     exit(1);
   }
+  consumeOrDie(&tokens, token_end, TK_Int);
+
   if (tokens->kind != TK_Identifier)
   {
     fprintf(stderr, "Expected Identifier but got: %d", tokens->kind);
@@ -511,12 +535,18 @@ Function *parseFunction(Token **ptrptr, Token *token_end)
 
   consumeOrDie(&tokens, token_end, TK_LeftParenthesis);
   // parameter
-  if (tokens->kind != TK_Identifier)
+  if (tokens->kind != TK_Int)
   {
     func->parameter_length = 0;
   }
   else
   {
+    tokens += 1;
+    if (tokens->kind != TK_Identifier)
+    {
+      fprintf(stderr, "expected:identifier but got %d\n", tokens->kind);
+      exit(1);
+    }
     func->parameter_length = 1;
     func->parameter_names[0] = tokens->identifier_name;
     tokens += 1;
@@ -525,6 +555,7 @@ Function *parseFunction(Token **ptrptr, Token *token_end)
       if (tokens->kind == TK_Comma)
       {
         tokens += 1;
+        consumeOrDie(&tokens, token_end, TK_Int);
         if (tokens->kind == TK_Identifier)
         {
           func->parameter_length = i + 1;

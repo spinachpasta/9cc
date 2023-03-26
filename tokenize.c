@@ -20,6 +20,14 @@ int tokenize(char *str)
             i += 6;
             continue;
         }
+        if (strncmp(ptr, "int", 3) == 0 && !is_alnum(ptr[3]))
+        {
+            Token token = {TK_Int, 0, NULL};
+            tokens[token_index] = token;
+            token_index++;
+            i += 3;
+            continue;
+        }
         if (strncmp(ptr, "if", 2) == 0 && !is_alnum(ptr[2]))
         {
             Token token = {TK_IF, 0, NULL};

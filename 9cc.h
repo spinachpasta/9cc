@@ -101,6 +101,7 @@ enum TokenKind
   TK_FOR,
   TK_Comma,
   TK_DefineFunction,
+  TK_Int,
 };
 
 typedef struct Token
