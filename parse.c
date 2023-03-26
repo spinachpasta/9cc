@@ -502,10 +502,30 @@ Function *parseFunction(Token **ptrptr, Token *token_end)
   // parameter
   if (tokens->kind == TK_Identifier)
   {
-    char *parameter_name = tokens->identifier_name;
-    func->parameter_length = 1;
-    func->parameter_names[0] = parameter_name;
+    {
+      char *parameter_name = tokens->identifier_name;
+      func->parameter_length = 1;
+      func->parameter_names[0] = parameter_name;
+    }
     tokens += 1;
+    if (tokens->kind == TK_Comma)
+    {
+      tokens += 1;
+      if (tokens->kind == TK_Identifier)
+      {
+        {
+          char *parameter_name = tokens->identifier_name;
+          func->parameter_length += 1;
+          func->parameter_names[1] = parameter_name;
+          tokens += 1;
+        }
+      }
+      else
+      {
+        fprintf(stderr, "expected identifier but got %d\n", tokens->kind);
+        exit(1);
+      }
+    }
   }
   else
   {
