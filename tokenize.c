@@ -298,10 +298,6 @@ int tokenize(char *str)
             char *name = malloc(length + 1);
             memcpy(name, start, length);
             name[length] = '\0';
-            if (!findLVar(name))
-            {
-                insertLVar(name);
-            }
             Token token = {TK_Identifier, 0, NULL};
             token.identifier_name = name;
             tokens[token_index] = token;
@@ -389,7 +385,7 @@ LVar *insertLVar(char *name)
     newlocal->name = name;
     if (!last)
     {
-        newlocal->offset = 0;
+        newlocal->offset = 8;
     }
     else
     {

@@ -341,15 +341,24 @@ Stmt *parseStmt(Token **ptrptr, Token *token_end)
   if (tokens->kind == TK_Int)
   {
     tokens += 1;
-    consumeOrDie(&tokens, token_end, TK_Identifier);
+    // consumeOrDie(&tokens, token_end, TK_Identifier);
+    if (tokens->kind == TK_Identifier)
+    {
+      if (!findLVar(tokens->identifier_name))
+      {
+        insertLVar(tokens->identifier_name);
+      }
+      tokens += 1;
+    }
+    else
+    {
+      fprintf(stderr, "Expected identifier but got: %d\n", tokens->kind);
+      exit(1);
+    }
     consumeOrDie(&tokens, token_end, TK_Semicolon);
     // Stmt *result = parseStmt(&tokens, token_end);
     // *ptrptr = tokens;
     // return result;
-    // if (tokens->kind == TK_Identifier)
-    // {
-
-    // }
     Stmt *stmt = malloc(sizeof(Stmt));
     stmt->stmt_kind = SK_Expr;
     stmt->first_child = NULL;
@@ -547,9 +556,16 @@ Function *parseFunction(Token **ptrptr, Token *token_end)
       fprintf(stderr, "expected:identifier but got %d\n", tokens->kind);
       exit(1);
     }
+    fprintf(stderr, "first param\n");
     func->parameter_length = 1;
     func->parameter_names[0] = tokens->identifier_name;
+    if (!findLVar(tokens->identifier_name))
+    {
+      insertLVar(tokens->identifier_name);
+    }
     tokens += 1;
+    fprintf(stderr, "first param done\n");
+
     for (int i = 1; i < 6; i++)
     {
       if (tokens->kind == TK_Comma)
@@ -560,6 +576,11 @@ Function *parseFunction(Token **ptrptr, Token *token_end)
         {
           func->parameter_length = i + 1;
           func->parameter_names[i] = tokens->identifier_name;
+          if (!findLVar(tokens->identifier_name))
+          {
+            insertLVar(tokens->identifier_name);
+          }
+          fprintf(stderr, "%d-th param done\n", i + 1);
           tokens += 1;
         }
         else

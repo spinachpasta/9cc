@@ -3,6 +3,7 @@
         "limits": "c",
         "type_traits": "c",
         "stdio.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "typeinfo": "c"
     }
 }

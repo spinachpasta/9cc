@@ -29,6 +29,7 @@ int main(int argc, char **argv)
     {
         Function *func = parseFunction(&ptr, token_end);
         CodegenFunction(func);
+        fprintf(stderr, "function %s done\n", func->name);
     }
 
     return 0;
