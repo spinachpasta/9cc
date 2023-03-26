@@ -1,5 +1,6 @@
 CFLAGS=-std=c11 -g -static -Wall -Wextra
-SRCS=$(wildcard *.c)
+SRCS_=$(wildcard *.c)
+SRCS=$(filter-out testfunc.c,$(SRCS_))
 OBJS=$(SRCS:.c=.o)
 
 9cc: $(OBJS)

@@ -377,8 +377,10 @@ LVar *findLVar(char *name)
     return NULL;
 }
 
-LVar *insertLVar(char *name)
+LVar *insertLVar(TypeAndIdent *typeandident)
 {
+    char *name = typeandident->identifier;
+    Type *type = typeandident->type;
     LVar *newlocal = calloc(1, sizeof(LVar));
     LVar *last = lastLVar();
     newlocal->len = strlen(name);
@@ -401,6 +403,7 @@ LVar *insertLVar(char *name)
     {
         last->next = newlocal;
     }
+    newlocal->type = type;
     return newlocal;
 }
 

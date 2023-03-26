@@ -343,7 +343,7 @@ Stmt *parseStmt(Token **ptrptr, Token *token_end)
     TypeAndIdent *typeident_local = parseTypeAndIdentifier(&tokens, token_end);
     if (!findLVar(typeident_local->identifier))
     {
-      insertLVar(typeident_local->identifier);
+      insertLVar(typeident_local);
     }
     consumeOrDie(&tokens, token_end, TK_Semicolon);
     // Stmt *result = parseStmt(&tokens, token_end);
@@ -540,7 +540,7 @@ TypeAndIdent *parseTypeAndIdentifier(Token **ptrptr, Token *token_end)
   if (tokens->kind == TK_Identifier)
   {
     typeandident->identifier = tokens->identifier_name;
-    typeandident->type = *previoustype;
+    typeandident->type = previoustype;
     tokens += 1;
     *ptrptr = tokens;
     return typeandident;
@@ -566,6 +566,7 @@ Function *parseFunction(Token **ptrptr, Token *token_end)
   Function *func = malloc(sizeof(Function));
   char *function_name = typeident_ret->identifier;
   func->name = function_name;
+  insertFunction(typeident_ret);
 
   consumeOrDie(&tokens, token_end, TK_LeftParenthesis);
   // parameter
@@ -581,7 +582,7 @@ Function *parseFunction(Token **ptrptr, Token *token_end)
     func->parameter_names[0] = typeident->identifier;
     if (!findLVar(typeident->identifier))
     {
-      insertLVar(typeident->identifier);
+      insertLVar(typeident);
     }
     fprintf(stderr, "first param done\n");
 
@@ -596,7 +597,7 @@ Function *parseFunction(Token **ptrptr, Token *token_end)
         func->parameter_names[i] = typeident->identifier;
         if (!findLVar(typeident->identifier))
         {
-          insertLVar(typeident->identifier);
+          insertLVar(typeident);
         }
         fprintf(stderr, "%d-th param done\n", i + 1);
       }

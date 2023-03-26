@@ -209,6 +209,39 @@ void EvaluateExprIntoRax(Expr *expr)
             printf("    mov [rax], rdi\n");
             break;
         }
+        if (expr->op == BO_Add)
+        {
+            Type *type_first = EvaluateType(expr->first_child);
+            Type *type_second = EvaluateType(expr->second_child);
+            EvaluateExprIntoRax(expr->first_child);
+            printf("    push rax\n");
+            EvaluateExprIntoRax(expr->second_child);
+            printf("    push rax\n");
+
+            if (type_first->kind == TYPE_INT && type_second->kind == TYPE_INT)
+            {
+                printf("    pop rdi\n");
+                printf("    pop rax\n");
+                printf("    add rax,rdi\n");
+            }
+            else if (type_first->kind == TYPE_PTR)
+            {
+                printf("    pop rax\n");
+                printf("    pop rsi\n");
+                printf("    mov rdi,%d\n", getSize(type_second->ptr_to));
+                printf("    imul rax,rdi\n");
+                printf("    add rax,rsi\n");
+            }
+            else if (type_second->kind == TYPE_PTR)
+            {
+                printf("    pop rsi\n");
+                printf("    pop rax\n");
+                printf("    mov rdi,%d\n", getSize(type_second->ptr_to));
+                printf("    imul rax,rdi\n");
+                printf("    add rax,rsi\n");
+            }
+            break;
+        }
         EvaluateExprIntoRax(expr->first_child);
         printf("    push rax\n");
         EvaluateExprIntoRax(expr->second_child);
@@ -219,14 +252,26 @@ void EvaluateExprIntoRax(Expr *expr)
 
         switch (expr->op)
         {
-        case BO_Add:
-        {
-            printf("    add rax,rdi\n");
-            break;
-        }
         case BO_Sub:
         {
-            printf("    sub rax,rdi\n");
+            Type *type_first = EvaluateType(expr->first_child);
+            Type *type_second = EvaluateType(expr->second_child);
+            if (type_second->kind == TYPE_PTR)
+            {
+                fprintf(stderr, "ptr-ptr is not supported yet");
+                exit(1);
+                // printf("    mul rax,%d\n", getSize(type_first->ptr_to));
+            }
+            else
+            {
+                if (type_first->kind == TYPE_PTR)
+                {
+                    fprintf(stderr, "ptr-int is not supported yet");
+                    exit(1);
+                    // printf("    mul rdi,%d\n", getSize(type_first->ptr_to));
+                }
+                printf("    sub rax,rdi\n");
+            }
             break;
         }
         case BO_Mul:
@@ -266,11 +311,6 @@ void EvaluateExprIntoRax(Expr *expr)
             printf("  cmp rax, rdi\n");
             printf("  setge al\n");
             printf("  movzb rax, al\n");
-            break;
-        }
-        case BO_AndThen:
-        {
-            printf("  mov rax, rdi\n");
             break;
         }
         default:

@@ -4,6 +4,13 @@
         "type_traits": "c",
         "stdio.h": "c",
         "stdlib.h": "c",
-        "typeinfo": "c"
+        "typeinfo": "c",
+        "bit": "c",
+        "compare": "c",
+        "cstddef": "c",
+        "string": "c",
+        "memory": "c",
+        "new": "c",
+        "functional": "c"
     }
 }

@@ -10,7 +10,6 @@ enum Operation
   BO_Greater,
   BO_GreaterEqual,
   BO_NotEqual,
-  BO_AndThen,
   BO_Assign,
   UO_AddressOf,
   UO_Deref,
@@ -24,6 +23,16 @@ enum ExprKind
   EK_Identifier,
   EK_CallFunction,
 };
+enum TypeKind
+{
+  TYPE_INT,
+  TYPE_PTR
+};
+typedef struct Type
+{
+  enum TypeKind kind;
+  struct Type *ptr_to;
+} Type;
 
 typedef struct Expr
 {
@@ -70,25 +79,25 @@ struct LVar
   char *name; // 変数の名前
   int len;    // 名前の長さ
   int offset; // RBPからのオフセット
+  Type *type;
 };
 
-typedef struct Type
+typedef struct FunctionDeclaration
 {
-  enum
-  {
-    TYPE_INT,
-    TYPE_PTR
-  } kind;
-  struct Type *ptr_to;
-} Type;
+  struct FunctionDeclaration *next;
+  char *name;
+  Type *return_type;
+} FunctionDeclaration;
+
 
 typedef struct TypeAndIdent
 {
-  Type type;
+  Type *type;
   char *identifier;
 } TypeAndIdent;
 
 extern LVar *locals;
+extern FunctionDeclaration *function_declarations;
 
 enum TokenKind
 {
@@ -158,10 +167,18 @@ void Codegen(Stmt *stmt);
 
 int tokenize(char *str);
 LVar *findLVar(char *name);
-LVar *insertLVar(char *name);
+LVar *insertLVar(TypeAndIdent *typeandident);
 LVar *lastLVar();
 int is_alnum(char c);
 
+Type* EvaluateType(Expr *expr);
+
 void EvaluateExprIntoRax(Expr *expr);
+
+FunctionDeclaration *findFunction(char *name);
+FunctionDeclaration *insertFunction(TypeAndIdent *typeandident);
+FunctionDeclaration *lastFunction();
+int getSize(Type *type);
+
 
 extern Token tokens[1000];

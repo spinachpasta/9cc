@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 int abc()
 {
 	return 3;
@@ -53,4 +55,16 @@ int myglobal = 11;
 int *pointerTest()
 {
 	return &myglobal;
+}
+
+int allocfour(int **ptr)
+{
+	int *x = calloc(4, sizeof(int));
+	x[0] = 1;
+	x[1] = 12;
+	x[2] = 13;
+	x[3] = 14;
+	*ptr = x;
+
+	return 0;
 }
