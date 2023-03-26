@@ -266,7 +266,7 @@ int tokenize(char *str)
             for (;;)
             {
                 char c1 = str[i];
-                if ('a' <= c1 && c1 <= 'z')
+                if (('a' <= c1 && c1 <= 'z') || ('0' <= c1 && c1 <= '9') || ('A' <= c1 && c1 <= 'Z') || c1 == '_')
                 {
                     i++;
                 }

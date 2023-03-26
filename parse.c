@@ -500,36 +500,37 @@ Function *parseFunction(Token **ptrptr, Token *token_end)
 
   consumeOrDie(&tokens, token_end, TK_LeftParenthesis);
   // parameter
-  if (tokens->kind == TK_Identifier)
+  if (tokens->kind != TK_Identifier)
   {
-    {
-      char *parameter_name = tokens->identifier_name;
-      func->parameter_length = 1;
-      func->parameter_names[0] = parameter_name;
-    }
+    func->parameter_length = 0;
+  }
+  else
+  {
+    func->parameter_length = 1;
+    func->parameter_names[0] = tokens->identifier_name;
     tokens += 1;
-    if (tokens->kind == TK_Comma)
+    for (int i = 1; i < 6; i++)
     {
-      tokens += 1;
-      if (tokens->kind == TK_Identifier)
+      if (tokens->kind == TK_Comma)
       {
+        tokens += 1;
+        if (tokens->kind == TK_Identifier)
         {
-          char *parameter_name = tokens->identifier_name;
-          func->parameter_length += 1;
-          func->parameter_names[1] = parameter_name;
+          func->parameter_length = i + 1;
+          func->parameter_names[i] = tokens->identifier_name;
           tokens += 1;
+        }
+        else
+        {
+          fprintf(stderr, "expected identifier but got %d\n", tokens->kind);
+          exit(1);
         }
       }
       else
       {
-        fprintf(stderr, "expected identifier but got %d\n", tokens->kind);
-        exit(1);
+        break;
       }
     }
-  }
-  else
-  {
-    func->parameter_length = 0;
   }
   consumeOrDie(&tokens, token_end, TK_RightParenthesis);
   if (tokens->kind != TK_LeftCurlyBrace)

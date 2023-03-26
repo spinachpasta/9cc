@@ -109,3 +109,7 @@ assert check("myfunc(a){return 10;} main(){return myfunc(1);}", 10)
 assert check("myident(a){return a;} main(){return myident(3);}", 3)
 assert check("myadd(a,b){return a+b;} main(){return myadd(3,2);}", 5)
 assert check("mysub(a,b){return a-b;} main(){return mysub(3,2);}", 1)
+
+assert check("mysub3(a,b,c){return a-b-c;} main(){return mysub3(3,1,1);}", 1)
+assert check(
+    "myfunc6(a,b,c,d,e,f){return a-b-c+d*e*f;} main(){return myfunc6(3,1,1,1,2,3);}", 7)
