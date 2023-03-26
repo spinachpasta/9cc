@@ -26,6 +26,10 @@ void EvaluateLValueAddressIntoRax(Expr *expr)
         printf("  mov rax, rbp\n");
         printf("  sub rax, %d\n", local->offset);
     }
+    else if (expr->expr_kind == EK_UnaryOperator && expr->op == UO_Deref)
+    {
+        EvaluateExprIntoRax(expr->first_child);
+    }
     else
     {
         fprintf(stderr, "not lvalue:expr kind=%d", expr->expr_kind);
