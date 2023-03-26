@@ -111,6 +111,8 @@ typedef struct Function
   /* data */
   Stmt* content;
   char* name;
+  int parameter_length;
+  char* parameter_names[6];
 }Function;
 
 

@@ -105,3 +105,5 @@ assert checkandlink("main(){return sixtharg(1,2,3,4,5,6);}", 6)
 
 
 assert check("myfunc(){return 10;} main(){return myfunc();}", 10)
+assert check("myfunc(a){return 10;} main(){return myfunc(1);}", 10)
+assert check("myident(a){return a;} main(){return myident(3);}", 3)

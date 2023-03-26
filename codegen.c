@@ -4,6 +4,15 @@
 
 int labelCounter = 0;
 
+char *registers[] = {
+    "rdi",
+    "rsi",
+    "rdx",
+    "rcx",
+    "r8",
+    "r9",
+};
+
 void EvaluateLValueAddressIntoRax(Expr *expr)
 {
     if (expr->expr_kind == EK_Identifier)
@@ -21,12 +30,20 @@ void EvaluateLValueAddressIntoRax(Expr *expr)
 
 void CodegenFunction(Function *func)
 {
-    printf(".globl %s\n",func->name);
+    printf(".globl %s\n", func->name);
     printf("%s:\n", func->name);
     // prologue
     printf("  push rbp\n");
     printf("  mov rbp, rsp\n");
     printf("  sub rsp, 208\n");
+    for (int i = 0; i < func->parameter_length; i++)
+    {
+        // fprintf(stderr,"%s\n",func->parameter_names[i]);
+        LVar *local = findLVar(func->parameter_names[i]);
+        printf("  mov rax, rbp\n");
+        printf("  sub rax, %d\n", local->offset);
+        printf("  mov [rax], %s\n", registers[i]);
+    }
     Codegen(func->content);
 }
 
@@ -128,14 +145,6 @@ void EvaluateExprIntoRax(Expr *expr)
                 printf("   push rax\n");
             }
         }
-        char *registers[] = {
-            "rdi",
-            "rsi",
-            "rdx",
-            "rcx",
-            "r8",
-            "r9",
-        };
         for (int i = 0; i < 6; i++)
         {
             if (expr->argments[i])

@@ -493,10 +493,24 @@ Function *parseFunction(Token **ptrptr, Token *token_end)
     fprintf(stderr, "Expected Identifier but got: %d", tokens->kind);
     exit(1);
   }
+  Function *func = malloc(sizeof(Function));
   char *function_name = tokens->identifier_name;
+  func->name = function_name;
   tokens += 1;
 
   consumeOrDie(&tokens, token_end, TK_LeftParenthesis);
+  // parameter
+  if (tokens->kind == TK_Identifier)
+  {
+    char *parameter_name = tokens->identifier_name;
+    func->parameter_length = 1;
+    func->parameter_names[0] = parameter_name;
+    tokens += 1;
+  }
+  else
+  {
+    func->parameter_length = 0;
+  }
   consumeOrDie(&tokens, token_end, TK_RightParenthesis);
   if (tokens->kind != TK_LeftCurlyBrace)
   {
@@ -506,8 +520,6 @@ Function *parseFunction(Token **ptrptr, Token *token_end)
   Stmt *content = parseFunctionContent(&tokens, token_end);
   // consumeOrDie(&tokens, token_end, TK_RightCurlyBrace);
   *ptrptr = tokens;
-  Function *func = malloc(sizeof(Function));
-  func->name = function_name;
   func->content = content;
   return func;
 }
