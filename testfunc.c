@@ -47,3 +47,10 @@ int sixtharg(int a, int b, int c, int d, int e, int f)
 {
 	return f;
 }
+
+int myglobal = 11;
+
+int *pointerTest()
+{
+	return &myglobal;
+}

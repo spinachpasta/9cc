@@ -115,3 +115,5 @@ assert check(
     "myfunc6(a,b,c,d,e,f){return a-b-c+d*e*f;} main(){return myfunc6(3,1,1,1,2,3);}", 7)
 
 assert check("main(){x=3;y=&x;return *y;}", 3)
+
+assert checkandlink("main(){return *pointerTest();}", 11)
