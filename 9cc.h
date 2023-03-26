@@ -1,6 +1,7 @@
 
 
-enum Operation{
+enum Operation
+{
   BO_Add,
   BO_Sub,
   BO_Mul,
@@ -32,10 +33,11 @@ typedef struct Expr
   struct Expr *first_child;
   struct Expr *second_child;
   struct Expr *argments[6];
-  char* name;
+  char *name;
 } Expr;
 
-enum StmtKind{
+enum StmtKind
+{
   SK_AndThen,
   SK_Expr,
   SK_Return,
@@ -48,7 +50,7 @@ enum StmtKind{
 typedef struct Stmt
 {
   enum StmtKind stmt_kind;
-  
+
   struct Expr *expr;
   struct Expr *expr1;
   struct Expr *expr2;
@@ -62,16 +64,31 @@ typedef struct Stmt
 typedef struct LVar LVar;
 
 // ローカル変数の型
-struct LVar {
+struct LVar
+{
   LVar *next; // 次の変数かNULL
-  char* name; // 変数の名前
+  char *name; // 変数の名前
   int len;    // 名前の長さ
   int offset; // RBPからのオフセット
 };
 
+typedef struct Type
+{
+  enum
+  {
+    TYPE_INT,
+    TYPE_PTR
+  } kind;
+  struct Type *ptr_to;
+} Type;
+
+typedef struct TypeAndIdent
+{
+  Type type;
+  char *identifier;
+} TypeAndIdent;
+
 extern LVar *locals;
-
-
 
 enum TokenKind
 {
@@ -108,18 +125,17 @@ typedef struct Token
 {
   enum TokenKind kind;
   int value;
-  char* identifier_name;
+  char *identifier_name;
 } Token;
 
 typedef struct Function
 {
   /* data */
-  Stmt* content;
-  char* name;
+  Stmt *content;
+  char *name;
   int parameter_length;
-  char* parameter_names[6];
-}Function;
-
+  char *parameter_names[6];
+} Function;
 
 // prototype declaration
 int isDigit(char c);
@@ -131,20 +147,20 @@ Expr *parseExpr(Token **ptrptr, Token *token_end);
 Expr *parseUnary(Token **ptrptr, Token *token_end);
 Stmt *parseProgram(Token **ptrptr, Token *token_end);
 Expr *parseAssign(Token **ptrptr, Token *token_end);
-Stmt *parseFor(Token **ptrptr,Token *token_end);
+Stmt *parseFor(Token **ptrptr, Token *token_end);
 Stmt *parseStmt(Token **ptrptr, Token *token_end);
 void consumeOrDie(Token **ptrptr, Token *token_end, enum TokenKind kind);
 Function *parseFunction(Token **ptrptr, Token *token_end);
-void CodegenFunction(Function* func);
+void CodegenFunction(Function *func);
+TypeAndIdent *parseTypeAndIdentifier(Token **ptrptr, Token *token_end);
 
-void Codegen(Stmt* stmt);
+void Codegen(Stmt *stmt);
 
 int tokenize(char *str);
 LVar *findLVar(char *name);
 LVar *insertLVar(char *name);
 LVar *lastLVar();
 int is_alnum(char c);
-
 
 void EvaluateExprIntoRax(Expr *expr);
 

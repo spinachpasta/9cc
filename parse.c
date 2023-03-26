@@ -340,20 +340,10 @@ Stmt *parseStmt(Token **ptrptr, Token *token_end)
 
   if (tokens->kind == TK_Int)
   {
-    tokens += 1;
-    // consumeOrDie(&tokens, token_end, TK_Identifier);
-    if (tokens->kind == TK_Identifier)
+    TypeAndIdent *typeident_local = parseTypeAndIdentifier(&tokens, token_end);
+    if (!findLVar(typeident_local->identifier))
     {
-      if (!findLVar(tokens->identifier_name))
-      {
-        insertLVar(tokens->identifier_name);
-      }
-      tokens += 1;
-    }
-    else
-    {
-      fprintf(stderr, "Expected identifier but got: %d\n", tokens->kind);
-      exit(1);
+      insertLVar(typeident_local->identifier);
     }
     consumeOrDie(&tokens, token_end, TK_Semicolon);
     // Stmt *result = parseStmt(&tokens, token_end);
@@ -522,6 +512,46 @@ Stmt *parseFunctionContent(Token **ptrptr, Token *token_end)
   return result;
 }
 
+TypeAndIdent *parseTypeAndIdentifier(Token **ptrptr, Token *token_end)
+{
+  Token *tokens = *ptrptr;
+  TypeAndIdent *typeandident = calloc(1, sizeof(TypeAndIdent));
+  Type *previoustype = calloc(1, sizeof(Type));
+  previoustype->kind = TYPE_INT;
+  consumeOrDie(&tokens, token_end, TK_Int);
+
+  for (int i = 0;; i++)
+  {
+    if (tokens->kind == TK_Mul)
+    {
+      {
+        Type *type = calloc(1, sizeof(Type));
+        type->kind = TYPE_PTR;
+        type->ptr_to = previoustype;
+        previoustype = type;
+      }
+      tokens++;
+    }
+    else
+    {
+      break;
+    }
+  }
+  if (tokens->kind == TK_Identifier)
+  {
+    typeandident->identifier = tokens->identifier_name;
+    typeandident->type = *previoustype;
+    tokens += 1;
+    *ptrptr = tokens;
+    return typeandident;
+  }
+  else
+  {
+    fprintf(stderr, "identifier expected after type\n");
+    exit(1);
+  }
+}
+
 Function *parseFunction(Token **ptrptr, Token *token_end)
 {
   Token *tokens = *ptrptr;
@@ -530,17 +560,12 @@ Function *parseFunction(Token **ptrptr, Token *token_end)
     fprintf(stderr, "No token found");
     exit(1);
   }
-  consumeOrDie(&tokens, token_end, TK_Int);
 
-  if (tokens->kind != TK_Identifier)
-  {
-    fprintf(stderr, "Expected Identifier but got: %d", tokens->kind);
-    exit(1);
-  }
+  TypeAndIdent *typeident_ret = parseTypeAndIdentifier(&tokens, token_end);
+
   Function *func = malloc(sizeof(Function));
-  char *function_name = tokens->identifier_name;
+  char *function_name = typeident_ret->identifier;
   func->name = function_name;
-  tokens += 1;
 
   consumeOrDie(&tokens, token_end, TK_LeftParenthesis);
   // parameter
@@ -550,20 +575,14 @@ Function *parseFunction(Token **ptrptr, Token *token_end)
   }
   else
   {
-    tokens += 1;
-    if (tokens->kind != TK_Identifier)
-    {
-      fprintf(stderr, "expected:identifier but got %d\n", tokens->kind);
-      exit(1);
-    }
+    TypeAndIdent *typeident = parseTypeAndIdentifier(&tokens, token_end);
     fprintf(stderr, "first param\n");
     func->parameter_length = 1;
-    func->parameter_names[0] = tokens->identifier_name;
-    if (!findLVar(tokens->identifier_name))
+    func->parameter_names[0] = typeident->identifier;
+    if (!findLVar(typeident->identifier))
     {
-      insertLVar(tokens->identifier_name);
+      insertLVar(typeident->identifier);
     }
-    tokens += 1;
     fprintf(stderr, "first param done\n");
 
     for (int i = 1; i < 6; i++)
@@ -571,23 +590,15 @@ Function *parseFunction(Token **ptrptr, Token *token_end)
       if (tokens->kind == TK_Comma)
       {
         tokens += 1;
-        consumeOrDie(&tokens, token_end, TK_Int);
-        if (tokens->kind == TK_Identifier)
+        TypeAndIdent *typeident = parseTypeAndIdentifier(&tokens, token_end);
+
+        func->parameter_length = i + 1;
+        func->parameter_names[i] = typeident->identifier;
+        if (!findLVar(typeident->identifier))
         {
-          func->parameter_length = i + 1;
-          func->parameter_names[i] = tokens->identifier_name;
-          if (!findLVar(tokens->identifier_name))
-          {
-            insertLVar(tokens->identifier_name);
-          }
-          fprintf(stderr, "%d-th param done\n", i + 1);
-          tokens += 1;
+          insertLVar(typeident->identifier);
         }
-        else
-        {
-          fprintf(stderr, "expected identifier but got %d\n", tokens->kind);
-          exit(1);
-        }
+        fprintf(stderr, "%d-th param done\n", i + 1);
       }
       else
       {

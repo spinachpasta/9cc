@@ -114,6 +114,6 @@ assert check("int mysub3(int a,int b,int c){return a-b-c;} int main(){return mys
 assert check(
     "int myfunc6(int a,int b,int c,int d,int e,int f){return a-b-c+d*e*f;} int main(){return myfunc6(3,1,1,1,2,3);}", 7)
 
-assert check("int main(){int x;int y;x=3;y=&x;return *y;}", 3)
+assert check("int main(){int x;int* y;x=3;y=&x;return *y;}", 3)
 
 assert checkandlink("int main(){return *pointerTest();}", 11)
