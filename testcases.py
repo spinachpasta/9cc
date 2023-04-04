@@ -129,3 +129,8 @@ assert check("int main(){int x;int *y;y = &x;*y = 3;return x;}", 3)
 assert checkandlink("int main(){return abc()+2;}", 5)
 
 assert checkandlink("int main(){int* p;allocfour(&p);return *(1+p);}", 12)
+assert checkandlink('''int main(){int *p;allocfour(&p);int *q;q = 2 + p;return *q;}''', 13)
+
+assert checkandlink('''int main(){int *p;allocfour(&p);int *q;q = p + 2;return *q;}''', 13)
+
+assert checkandlink('''int main(){int *p;allocfour(&p);int *q;q = p + 2;*q;q = p + 3;return *q;}''', 14)

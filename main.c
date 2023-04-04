@@ -28,6 +28,7 @@ int main(int argc, char **argv)
     for (; ptr < token_end;)
     {
         Function *func = parseFunction(&ptr, token_end);
+        fprintf(stderr, "parse function %s done\n", func->name);
         CodegenFunction(func);
         fprintf(stderr, "function %s done\n", func->name);
     }
