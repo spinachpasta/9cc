@@ -174,7 +174,7 @@ void Codegen(Stmt *stmt);
 int tokenize(char *str);
 LVar *findLVar(char *name);
 LVar *insertLVar(TypeAndIdent *typeandident);
-LVar *insertLArray(TypeAndIdent *typeandident, int arr_length);
+LVar *insertLArray(TypeAndIdent *typeandident);
 
 LVar *lastLVar();
 int is_alnum(char c);

@@ -392,7 +392,7 @@ Stmt *parseStmt(Token **ptrptr, Token *token_end)
 
       if (!findLVar(typeident_local->identifier))
       {
-        insertLArray(typeident_local,arr_length);
+        insertLArray(typeident_local);
       }
 
       Stmt *stmt = malloc(sizeof(Stmt));

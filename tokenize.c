@@ -443,7 +443,7 @@ int round_up(int x, int y)
     return a + 1;
 }
 
-LVar *insertLArray(TypeAndIdent *typeandident, int arr_length)
+LVar *insertLArray(TypeAndIdent *typeandident)
 {
     char *name = typeandident->identifier;
     Type *type = typeandident->type;
@@ -451,14 +451,14 @@ LVar *insertLArray(TypeAndIdent *typeandident, int arr_length)
     LVar *last = lastLVar();
     newlocal->len = strlen(name);
     newlocal->name = name;
-    int arr_size = round_up(arr_length * getSize(type), 8);
+    int var_size = round_up(getSize(type), 8);
     if (!last)
     {
-        newlocal->offset = arr_size;
+        newlocal->offset = var_size;
     }
     else
     {
-        newlocal->offset = last->offset + arr_size; // offset+last size
+        newlocal->offset = last->offset + var_size; // offset+last size
     }
     newlocal->next = NULL;
 
