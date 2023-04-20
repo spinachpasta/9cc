@@ -55,6 +55,7 @@ Type *EvaluateType(Expr *expr)
     }
     if (expr->expr_kind == EK_BinaryOperator)
     {
+
         if (expr->op == BO_Add)
         {
             Type *first = EvaluateType(expr->first_child);
@@ -63,11 +64,11 @@ Type *EvaluateType(Expr *expr)
             {
                 return first;
             }
-            if (first->kind == TYPE_INT && second->kind == TYPE_PTR)
+            if (first->kind == TYPE_INT && isPointerOrArray(second->kind))
             {
                 return second;
             }
-            if (second->kind == TYPE_PTR && second->kind == TYPE_INT)
+            if (isPointerOrArray(first->kind) && second->kind == TYPE_INT)
             {
                 return first;
             }
@@ -82,11 +83,11 @@ Type *EvaluateType(Expr *expr)
             {
                 return first;
             }
-            if (first->kind == TYPE_PTR && second->kind == TYPE_INT)
+            if (isPointerOrArray(first->kind) && second->kind == TYPE_INT)
             {
                 return first;
             }
-            if (first->kind == TYPE_PTR && second->kind == TYPE_PTR)
+            if (isPointerOrArray(first->kind) && isPointerOrArray(second->kind))
             {
                 Type *int_type = calloc(1, sizeof(Type));
                 int_type->kind = TYPE_INT;
@@ -140,6 +141,11 @@ Type *EvaluateType(Expr *expr)
         }
     }
     return NULL;
+}
+
+int isPointerOrArray(Type *t)
+{
+    return t->kind == TYPE_PTR || t->kind == TYPE_ARRAY;
 }
 
 int typeEqual(Type *t1, Type *t2)

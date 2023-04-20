@@ -154,6 +154,12 @@ void Codegen(Stmt *stmt)
 }
 void EvaluateExprIntoRax(Expr *expr)
 {
+    if (EvaluateType(expr)->kind == TYPE_ARRAY)
+    {
+        fprintf(stderr,"encountering array type\n");
+        EvaluateLValueAddressIntoRax(expr);
+        return;
+    }
     switch (expr->expr_kind)
     {
     case EK_CallFunction:
@@ -230,7 +236,7 @@ void EvaluateExprIntoRax(Expr *expr)
             printf("    push rax\n");
             EvaluateExprIntoRax(expr->second_child);
             printf("    push rax\n");
-            
+
             // fprintf(stderr, "types: %p %p\n", type_first, type_second);
 
             if (type_first->kind == TYPE_INT && type_second->kind == TYPE_INT)

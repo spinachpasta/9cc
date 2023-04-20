@@ -139,3 +139,5 @@ assert checkandlink('''int main(){return sizeof(1);}''', 4)
 assert checkandlink('''int main(){int *p;return sizeof(p);}''', 8)
 
 assert checkandlink('''int main(){int arr[10];return sizeof(arr);}''', 40)
+
+assert checkandlink('''int main(){int arr[10];*(arr+1)=1;return *(arr+1);}''', 1)

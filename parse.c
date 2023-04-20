@@ -257,6 +257,7 @@ Expr *parseUnary(Token **ptrptr, Token *token_end)
 
 Expr *parseExpr(Token **ptrptr, Token *token_end)
 {
+  fprintf(stderr, "parseExpr Token:%d\n",(*ptrptr)->kind);
   return parseAssign(ptrptr, token_end);
 }
 Expr *parseAssign(Token **ptrptr, Token *token_end)
