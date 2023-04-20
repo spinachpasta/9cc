@@ -12,6 +12,14 @@ int tokenize(char *str)
     {
         char c = str[i];
         char *ptr = str + i;
+        if (strncmp(ptr, "sizeof", 6) == 0 && !is_alnum(ptr[6]))
+        {
+            Token token = {TK_SizeOf, 0, NULL};
+            tokens[token_index] = token;
+            token_index++;
+            i += 6;
+            continue;
+        }
         if (strncmp(ptr, "return", 6) == 0 && !is_alnum(ptr[6]))
         {
             Token token = {TK_Return, 0, NULL};

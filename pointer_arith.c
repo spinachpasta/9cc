@@ -33,6 +33,12 @@ Type *EvaluateType(Expr *expr)
     }
     if (expr->expr_kind == EK_UnaryOperator)
     {
+        if (expr->op == UO_SizeOf)
+        {
+            Type *int_type = calloc(1, sizeof(Type));
+            int_type->kind = TYPE_INT;
+            return int_type;
+        }
         if (expr->op == UO_AddressOf)
         {
             Type *ptr_to = EvaluateType(expr->first_child);

@@ -13,6 +13,7 @@ enum Operation
   BO_Assign,
   UO_AddressOf,
   UO_Deref,
+  UO_SizeOf,
 };
 
 enum ExprKind
@@ -128,6 +129,7 @@ enum TokenKind
   TK_Comma,
   TK_DefineFunction,
   TK_Int,
+  TK_SizeOf,
 };
 
 typedef struct Token

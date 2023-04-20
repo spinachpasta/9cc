@@ -233,6 +233,15 @@ Expr *parseUnary(Token **ptrptr, Token *token_end)
     *ptrptr += 1;
     return binaryExpr(numberexpr(0), parsePrimary(ptrptr, token_end), BO_Sub);
   }
+  if (maybe_unary->kind == TK_SizeOf)
+  {
+    *ptrptr += 1;
+    Expr *expr = parsePrimary(ptrptr, token_end);
+
+    Type *type = EvaluateType(expr);
+    return numberexpr(getSize(type));
+    // return unaryExpr(parsePrimary(ptrptr, token_end), UO_SizeOf);
+  }
   if (maybe_unary->kind == TK_Mul)
   {
     *ptrptr += 1;

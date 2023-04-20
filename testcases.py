@@ -134,3 +134,6 @@ assert checkandlink('''int main(){int *p;allocfour(&p);int *q;q = 2 + p;return *
 assert checkandlink('''int main(){int *p;allocfour(&p);int *q;q = p + 2;return *q;}''', 13)
 
 assert checkandlink('''int main(){int *p;allocfour(&p);int *q;q = p + 2;*q;q = p + 3;return *q;}''', 14)
+
+assert checkandlink('''int main(){return sizeof(1);}''', 4)
+assert checkandlink('''int main(){int *p;return sizeof(p);}''', 8)
