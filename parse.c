@@ -350,22 +350,65 @@ Stmt *parseStmt(Token **ptrptr, Token *token_end)
   if (tokens->kind == TK_Int)
   {
     TypeAndIdent *typeident_local = parseTypeAndIdentifier(&tokens, token_end);
-    if (!findLVar(typeident_local->identifier))
+    if (tokens->kind == TK_Semicolon)
     {
-      insertLVar(typeident_local);
+      if (!findLVar(typeident_local->identifier))
+      {
+        insertLVar(typeident_local);
+      }
+      tokens += 1;
+      Stmt *stmt = malloc(sizeof(Stmt));
+      stmt->stmt_kind = SK_Expr;
+      stmt->first_child = NULL;
+      stmt->second_child = NULL;
+      stmt->third_child = NULL;
+      stmt->expr = numberexpr(42);
+      *ptrptr = tokens;
+      return stmt;
     }
-    consumeOrDie(&tokens, token_end, TK_Semicolon);
-    // Stmt *result = parseStmt(&tokens, token_end);
-    // *ptrptr = tokens;
-    // return result;
-    Stmt *stmt = malloc(sizeof(Stmt));
-    stmt->stmt_kind = SK_Expr;
-    stmt->first_child = NULL;
-    stmt->second_child = NULL;
-    stmt->third_child = NULL;
-    stmt->expr = numberexpr(42);
-    *ptrptr = tokens;
-    return stmt;
+    else if (tokens->kind == TK_LeftSquareBracket)
+    {
+      tokens += 1;
+      int arr_length;
+      if (tokens->kind == TK_Number)
+      {
+        arr_length = tokens->value;
+        tokens += 1;
+      }
+      else
+      {
+        fprintf(stderr, "Expected number but got: %d", tokens->kind);
+        exit(1);
+      }
+      consumeOrDie(&tokens, token_end, TK_RightSquareBracket);
+      consumeOrDie(&tokens, token_end, TK_Semicolon);
+      // typeident_local->type=TYPE_ARRAY;
+      Type *arr_type = calloc(1, sizeof(Type));
+      arr_type->kind = TYPE_ARRAY;
+      arr_type->array_length = arr_length;
+      arr_type->ptr_to = typeident_local->type;
+
+      typeident_local->type = arr_type;
+
+      if (!findLVar(typeident_local->identifier))
+      {
+        insertLArray(typeident_local,arr_length);
+      }
+
+      Stmt *stmt = malloc(sizeof(Stmt));
+      stmt->stmt_kind = SK_Expr;
+      stmt->first_child = NULL;
+      stmt->second_child = NULL;
+      stmt->third_child = NULL;
+      stmt->expr = numberexpr(42);
+      *ptrptr = tokens;
+      return stmt;
+    }
+    else
+    {
+      fprintf(stderr, "Expected semicolon but got: %d", tokens->kind);
+      exit(1);
+    }
   }
 
   if (tokens->kind == TK_LeftCurlyBrace)

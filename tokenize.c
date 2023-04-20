@@ -133,6 +133,24 @@ int tokenize(char *str)
             i++;
             break;
         }
+        case '[':
+        {
+            /* code */
+            Token token = {TK_LeftSquareBracket, 0, NULL};
+            tokens[token_index] = token;
+            token_index++;
+            i++;
+            break;
+        }
+        case ']':
+        {
+            /* code */
+            Token token = {TK_RightSquareBracket, 0, NULL};
+            tokens[token_index] = token;
+            token_index++;
+            i++;
+            break;
+        }
         case '-':
         {
             Token token = {TK_Minus, 0, NULL};
@@ -400,6 +418,47 @@ LVar *insertLVar(TypeAndIdent *typeandident)
     else
     {
         newlocal->offset = last->offset + 8; // offset+last size
+    }
+    newlocal->next = NULL;
+
+    if (!last)
+    {
+        locals = newlocal;
+    }
+    else
+    {
+        last->next = newlocal;
+    }
+    newlocal->type = type;
+    return newlocal;
+}
+
+int round_up(int x, int y)
+{
+    int a = (x / y) * y;
+    if (a == x)
+    {
+        return a;
+    }
+    return a + 1;
+}
+
+LVar *insertLArray(TypeAndIdent *typeandident, int arr_length)
+{
+    char *name = typeandident->identifier;
+    Type *type = typeandident->type;
+    LVar *newlocal = calloc(1, sizeof(LVar));
+    LVar *last = lastLVar();
+    newlocal->len = strlen(name);
+    newlocal->name = name;
+    int arr_size = round_up(arr_length * getSize(type), 8);
+    if (!last)
+    {
+        newlocal->offset = arr_size;
+    }
+    else
+    {
+        newlocal->offset = last->offset + arr_size; // offset+last size
     }
     newlocal->next = NULL;
 

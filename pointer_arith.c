@@ -217,6 +217,10 @@ int getSize(Type *type)
     {
         return 8;
     }
+    if (type->kind == TYPE_ARRAY)
+    {
+        return getSize(type->ptr_to) * type->array_length;
+    }
     fprintf(stderr, "getSize:invalid type:%d", type->kind);
     exit(1);
 }

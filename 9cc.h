@@ -27,12 +27,14 @@ enum ExprKind
 enum TypeKind
 {
   TYPE_INT,
-  TYPE_PTR
+  TYPE_PTR,
+  TYPE_ARRAY,
 };
 typedef struct Type
 {
   enum TypeKind kind;
   struct Type *ptr_to;
+  int array_length;
 } Type;
 
 typedef struct Expr
@@ -112,6 +114,8 @@ enum TokenKind
   TK_RightParenthesis,
   TK_LeftCurlyBrace,
   TK_RightCurlyBrace,
+  TK_LeftSquareBracket,
+  TK_RightSquareBracket,
   TK_Equal,
   TK_NotEqual,
   TK_Greater,
@@ -170,6 +174,8 @@ void Codegen(Stmt *stmt);
 int tokenize(char *str);
 LVar *findLVar(char *name);
 LVar *insertLVar(TypeAndIdent *typeandident);
+LVar *insertLArray(TypeAndIdent *typeandident, int arr_length);
+
 LVar *lastLVar();
 int is_alnum(char c);
 
@@ -180,7 +186,10 @@ void EvaluateExprIntoRax(Expr *expr);
 FunctionDeclaration *findFunction(char *name);
 FunctionDeclaration *insertFunction(TypeAndIdent *typeandident);
 FunctionDeclaration *lastFunction();
+int typeEqual(Type *t1, Type *t2);
+
 int getSize(Type *type);
 
+int round_up(int x, int y);
 
 extern Token tokens[1000];
