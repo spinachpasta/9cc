@@ -403,36 +403,6 @@ LVar *findLVar(char *name)
     return NULL;
 }
 
-LVar *insertLVar(TypeAndIdent *typeandident)
-{
-    char *name = typeandident->identifier;
-    Type *type = typeandident->type;
-    LVar *newlocal = calloc(1, sizeof(LVar));
-    LVar *last = lastLVar();
-    newlocal->len = strlen(name);
-    newlocal->name = name;
-    if (!last)
-    {
-        newlocal->offset = 8;
-    }
-    else
-    {
-        newlocal->offset = last->offset + 8; // offset+last size
-    }
-    newlocal->next = NULL;
-
-    if (!last)
-    {
-        locals = newlocal;
-    }
-    else
-    {
-        last->next = newlocal;
-    }
-    newlocal->type = type;
-    return newlocal;
-}
-
 int round_up(int x, int y)
 {
     int a = (x / y) * y;
@@ -443,7 +413,7 @@ int round_up(int x, int y)
     return a + 1;
 }
 
-LVar *insertLArray(TypeAndIdent *typeandident)
+LVar *insertLVar(TypeAndIdent *typeandident)
 {
     char *name = typeandident->identifier;
     Type *type = typeandident->type;
@@ -452,6 +422,10 @@ LVar *insertLArray(TypeAndIdent *typeandident)
     newlocal->len = strlen(name);
     newlocal->name = name;
     int var_size = round_up(getSize(type), 8);
+    if (type->kind != TYPE_ARRAY)
+    {
+        var_size = 8;
+    }
     if (!last)
     {
         newlocal->offset = var_size;
