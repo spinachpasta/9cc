@@ -192,4 +192,6 @@ int getSize(Type *type);
 
 int round_up(int x, int y);
 
+int isPointerOrArray(Type *t);
+
 extern Token tokens[1000];

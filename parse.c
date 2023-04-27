@@ -257,7 +257,7 @@ Expr *parseUnary(Token **ptrptr, Token *token_end)
 
 Expr *parseExpr(Token **ptrptr, Token *token_end)
 {
-  fprintf(stderr, "parseExpr Token:%d\n",(*ptrptr)->kind);
+  // fprintf(stderr, "parseExpr Token:%d\n",(*ptrptr)->kind);
   return parseAssign(ptrptr, token_end);
 }
 Expr *parseAssign(Token **ptrptr, Token *token_end)
@@ -630,14 +630,14 @@ Function *parseFunction(Token **ptrptr, Token *token_end)
   else
   {
     TypeAndIdent *typeident = parseTypeAndIdentifier(&tokens, token_end);
-    fprintf(stderr, "first param\n");
+    // fprintf(stderr, "first param\n");
     func->parameter_length = 1;
     func->parameter_names[0] = typeident->identifier;
     if (!findLVar(typeident->identifier))
     {
       insertLVar(typeident);
     }
-    fprintf(stderr, "first param done\n");
+    // fprintf(stderr, "first param done\n");
 
     for (int i = 1; i < 6; i++)
     {
@@ -652,7 +652,7 @@ Function *parseFunction(Token **ptrptr, Token *token_end)
         {
           insertLVar(typeident);
         }
-        fprintf(stderr, "%d-th param done\n", i + 1);
+        // fprintf(stderr, "%d-th param done\n", i + 1);
       }
       else
       {

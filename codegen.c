@@ -67,20 +67,20 @@ void Codegen(Stmt *stmt)
     {
     case SK_Expr:
     {
-        fprintf(stderr, "Expr\n");
+        // fprintf(stderr, "Expr\n");
         EvaluateExprIntoRax(stmt->expr);
         break;
     }
     case SK_AndThen:
     {
-        fprintf(stderr, "SK_AndThen\n");
+        // fprintf(stderr, "SK_AndThen\n");
         Codegen(stmt->first_child);
         Codegen(stmt->second_child);
         break;
     }
     case SK_Return:
     {
-        fprintf(stderr, "SK_Return\n");
+        // fprintf(stderr, "SK_Return\n");
         EvaluateExprIntoRax(stmt->expr);
         // epilogue
         printf("  mov rsp, rbp\n");
@@ -90,7 +90,7 @@ void Codegen(Stmt *stmt)
     }
     case SK_If:
     {
-        fprintf(stderr, "SK_If\n");
+        // fprintf(stderr, "SK_If\n");
         EvaluateExprIntoRax(stmt->expr);
         printf("  cmp rax, 0\n");
         printf("  je  .Lelse%d\n", labelCounter);
@@ -107,7 +107,7 @@ void Codegen(Stmt *stmt)
     }
     case SK_While:
     {
-        fprintf(stderr, "SK_While\n");
+        // fprintf(stderr, "SK_While\n");
         printf(".Lbegin%d:\n", labelCounter);
         EvaluateExprIntoRax(stmt->expr);
         printf("  cmp rax, 0\n");
@@ -121,7 +121,7 @@ void Codegen(Stmt *stmt)
     }
     case SK_For:
     {
-        fprintf(stderr, "SK_For\n");
+        // fprintf(stderr, "SK_For\n");
         if (stmt->expr)
         {
             EvaluateExprIntoRax(stmt->expr);
@@ -154,16 +154,16 @@ void Codegen(Stmt *stmt)
 }
 void EvaluateExprIntoRax(Expr *expr)
 {
-    if (EvaluateType(expr)->kind == TYPE_ARRAY)
-    {
-        fprintf(stderr,"encountering array type\n");
-        EvaluateLValueAddressIntoRax(expr);
-        return;
-    }
+    // if (EvaluateType(expr)->kind == TYPE_ARRAY)
+    // {
+    //     // fprintf(stderr,"encountering array type\n");
+    //     EvaluateLValueAddressIntoRax(expr);
+    //     return;
+    // }
     switch (expr->expr_kind)
     {
     case EK_CallFunction:
-        fprintf(stderr, "EK_CallFunction\n");
+        // fprintf(stderr, "EK_CallFunction\n");
         for (int i = 5; i >= 0; i--)
         {
             if (expr->argments[i])
@@ -182,13 +182,13 @@ void EvaluateExprIntoRax(Expr *expr)
         printf("   call %s\n", expr->name);
         break;
     case EK_Identifier:
-        fprintf(stderr, "EK_Identifier\n");
+        // fprintf(stderr, "EK_Identifier\n");
         EvaluateLValueAddressIntoRax(expr);
         printf("  mov rax,[rax]\n");
         break;
 
     case EK_Number:
-        fprintf(stderr, "EK_Number\n");
+        // fprintf(stderr, "EK_Number\n");
         printf("  mov rax, %d\n", expr->value);
         break;
     case EK_UnaryOperator:
@@ -196,12 +196,12 @@ void EvaluateExprIntoRax(Expr *expr)
         switch (expr->op)
         {
         case UO_Deref:
-            fprintf(stderr, "UO_Deref\n");
+            // fprintf(stderr, "UO_Deref\n");
             EvaluateExprIntoRax(expr->first_child);
             printf("    mov rax,[rax]\n");
             break;
         case UO_AddressOf:
-            fprintf(stderr, "UO_AddressOf\n");
+            // fprintf(stderr, "UO_AddressOf\n");
             EvaluateLValueAddressIntoRax(expr->first_child);
             break;
         default:
@@ -217,7 +217,7 @@ void EvaluateExprIntoRax(Expr *expr)
     {
         if (expr->op == BO_Assign)
         {
-            fprintf(stderr, "BO_Assign\n");
+            // fprintf(stderr, "BO_Assign\n");
             EvaluateLValueAddressIntoRax(expr->first_child);
             printf("    push rax\n");
             EvaluateExprIntoRax(expr->second_child);
@@ -229,7 +229,7 @@ void EvaluateExprIntoRax(Expr *expr)
         }
         if (expr->op == BO_Add)
         {
-            fprintf(stderr, "BO_Add\n");
+            // fprintf(stderr, "BO_Add\n");
             Type *type_first = EvaluateType(expr->first_child);
             Type *type_second = EvaluateType(expr->second_child);
             EvaluateExprIntoRax(expr->first_child);
@@ -245,7 +245,7 @@ void EvaluateExprIntoRax(Expr *expr)
                 printf("    pop rax\n");
                 printf("    add rax,rdi\n");
             }
-            else if (type_first->kind == TYPE_PTR)
+            else if (isPointerOrArray(type_first))
             {
                 printf("    pop rax\n");
                 printf("    pop rsi\n");
@@ -253,7 +253,7 @@ void EvaluateExprIntoRax(Expr *expr)
                 printf("    imul rax,rdi\n");
                 printf("    add rax,rsi\n");
             }
-            else if (type_second->kind == TYPE_PTR)
+            else if (isPointerOrArray(type_second))
             {
                 printf("    pop rsi\n");
                 printf("    pop rax\n");
@@ -275,7 +275,7 @@ void EvaluateExprIntoRax(Expr *expr)
         {
         case BO_Sub:
         {
-            fprintf(stderr, "BO_Sub\n");
+            // fprintf(stderr, "BO_Sub\n");
             Type *type_first = EvaluateType(expr->first_child);
             Type *type_second = EvaluateType(expr->second_child);
             if (type_second->kind == TYPE_PTR)
@@ -298,20 +298,20 @@ void EvaluateExprIntoRax(Expr *expr)
         }
         case BO_Mul:
         {
-            fprintf(stderr, "BO_Mul\n");
+            // fprintf(stderr, "BO_Mul\n");
             printf("    imul rax,rdi\n");
             break;
         }
         case BO_Div:
         {
-            fprintf(stderr, "BO_Div\n");
+            // fprintf(stderr, "BO_Div\n");
             printf("  cqo\n");
             printf("  idiv rdi\n");
             break;
         }
         case BO_Equal:
         {
-            fprintf(stderr, "BO_Equal\n");
+            // fprintf(stderr, "BO_Equal\n");
             printf("  cmp rax, rdi\n");
             printf("  sete al\n");
             printf("  movzb rax, al\n");
@@ -319,7 +319,7 @@ void EvaluateExprIntoRax(Expr *expr)
         }
         case BO_NotEqual:
         {
-            fprintf(stderr, "BO_NotEqual\n");
+            // fprintf(stderr, "BO_NotEqual\n");
             printf("  cmp rax, rdi\n");
             printf("  setne al\n");
             printf("  movzb rax, al\n");
@@ -327,7 +327,7 @@ void EvaluateExprIntoRax(Expr *expr)
         }
         case BO_Greater:
         {
-            fprintf(stderr, "BO_Greater\n");
+            // fprintf(stderr, "BO_Greater\n");
             printf("  cmp rax, rdi\n");
             printf("  setg al\n");
             printf("  movzb rax, al\n");
@@ -335,7 +335,7 @@ void EvaluateExprIntoRax(Expr *expr)
         }
         case BO_GreaterEqual:
         {
-            fprintf(stderr, "BO_GreaterEqual\n");
+            // fprintf(stderr, "BO_GreaterEqual\n");
             printf("  cmp rax, rdi\n");
             printf("  setge al\n");
             printf("  movzb rax, al\n");

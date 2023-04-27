@@ -64,11 +64,11 @@ Type *EvaluateType(Expr *expr)
             {
                 return first;
             }
-            if (first->kind == TYPE_INT && isPointerOrArray(second->kind))
+            if (first->kind == TYPE_INT && isPointerOrArray(second))
             {
                 return second;
             }
-            if (isPointerOrArray(first->kind) && second->kind == TYPE_INT)
+            if (isPointerOrArray(first) && second->kind == TYPE_INT)
             {
                 return first;
             }
@@ -83,11 +83,11 @@ Type *EvaluateType(Expr *expr)
             {
                 return first;
             }
-            if (isPointerOrArray(first->kind) && second->kind == TYPE_INT)
+            if (isPointerOrArray(first) && second->kind == TYPE_INT)
             {
                 return first;
             }
-            if (isPointerOrArray(first->kind) && isPointerOrArray(second->kind))
+            if (isPointerOrArray(first) && isPointerOrArray(second))
             {
                 Type *int_type = calloc(1, sizeof(Type));
                 int_type->kind = TYPE_INT;
